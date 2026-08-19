@@ -72,7 +72,7 @@ public class Chatty {
         } else if (input.startsWith("event ")) {
             addEvent(input, tasks);
         } else {
-            addTask(new Task(input, "T", ""), tasks);
+            addTask(new Todo(input), tasks);
         }
         System.out.println(HORIZONTAL_LINE);
         return true;
@@ -81,7 +81,7 @@ public class Chatty {
     /** Adds a todo described by the text after the {@code todo} command. */
     private static void addTodo(String input, List<Task> tasks) {
         String description = input.substring("todo ".length());
-        addTask(new Task(description, "T", ""), tasks);
+        addTask(new Todo(description), tasks);
     }
 
     /** Adds a deadline using the description and text after the {@code /by} delimiter. */
@@ -90,7 +90,7 @@ public class Chatty {
         int byIndex = details.indexOf(" /by ");
         String description = details.substring(0, byIndex);
         String by = details.substring(byIndex + " /by ".length());
-        addTask(new Task(description, "D", " (by: " + by + ")"), tasks);
+        addTask(new Deadline(description, by), tasks);
     }
 
     /** Adds an event using the description and text after its time delimiters. */
@@ -101,7 +101,7 @@ public class Chatty {
         String description = details.substring(0, fromIndex);
         String from = details.substring(fromIndex + " /from ".length(), toIndex);
         String to = details.substring(toIndex + " /to ".length());
-        addTask(new Task(description, "E", " (from: " + from + " to: " + to + ")"), tasks);
+        addTask(new Event(description, from, to), tasks);
     }
 
     /** Adds a task and prints its details and the updated task count. */
