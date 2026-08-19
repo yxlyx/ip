@@ -78,6 +78,20 @@ OK, I've marked this task as not done yet:
   [D][ ] return book (by: Sunday)
 ```
 
+## Handling invalid input
+
+Chatty explains invalid commands instead of stopping unexpectedly. Error
+messages identify what is missing and, where useful, show the expected format.
+For example, a todo must have a description:
+
+```text
+OOPS!!! The description of a todo cannot be empty.
+```
+
+Task numbers used with `mark` and `unmark` must be whole numbers that appear in
+the current list. Deadline and event commands must include all documented
+delimiters and values.
+
 ## Exiting Chatty
 
 Enter `bye` to close Chatty.

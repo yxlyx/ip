@@ -49,59 +49,106 @@ public class Chatty {
     /**
      * Processes one user command and prints Chatty's response.
      *
-     * @param input command entered by the user
+     * @param rawInput command entered by the user
      * @param tasks tasks stored during this Chatty session
      * @return false if Chatty should exit, and true otherwise
      */
-    private static boolean processCommand(String input, List<Task> tasks) {
+    private static boolean processCommand(String rawInput, List<Task> tasks) {
+        String input = rawInput.strip();
         System.out.println(HORIZONTAL_LINE);
         if (input.equals("bye")) {
             System.out.println(" Bye. Hope to see you again soon!");
             System.out.println(HORIZONTAL_LINE);
             return false;
-        } else if (input.equals("list")) {
-            printTaskList(tasks);
-        } else if (input.startsWith("mark ")) {
-            markTask(input, tasks);
-        } else if (input.startsWith("unmark ")) {
-            unmarkTask(input, tasks);
-        } else if (input.startsWith("todo ")) {
-            addTodo(input, tasks);
-        } else if (input.startsWith("deadline ")) {
-            addDeadline(input, tasks);
-        } else if (input.startsWith("event ")) {
-            addEvent(input, tasks);
-        } else {
-            addTask(new Todo(input), tasks);
+        }
+
+        try {
+            if (input.equals("list")) {
+                printTaskList(tasks);
+            } else if (isCommand(input, "mark")) {
+                markTask(input, tasks);
+            } else if (isCommand(input, "unmark")) {
+                unmarkTask(input, tasks);
+            } else if (isCommand(input, "todo")) {
+                addTodo(input, tasks);
+            } else if (isCommand(input, "deadline")) {
+                addDeadline(input, tasks);
+            } else if (isCommand(input, "event")) {
+                addEvent(input, tasks);
+            } else {
+                throw new ChattyException("OOPS!!! I don't recognise that command. "
+                        + "Try todo, deadline, event, list, mark, unmark, or bye.");
+            }
+        } catch (ChattyException exception) {
+            System.out.println(" " + exception.getMessage());
         }
         System.out.println(HORIZONTAL_LINE);
         return true;
     }
 
+    /** Returns whether the input is the given command, optionally followed by arguments. */
+    private static boolean isCommand(String input, String command) {
+        return input.equals(command) || input.startsWith(command + " ");
+    }
+
     /** Adds a todo described by the text after the {@code todo} command. */
-    private static void addTodo(String input, List<Task> tasks) {
-        String description = input.substring("todo ".length());
+    private static void addTodo(String input, List<Task> tasks) throws ChattyException {
+        String description = input.substring("todo".length()).strip();
+        requireDescription(description, "todo");
         addTask(new Todo(description), tasks);
     }
 
     /** Adds a deadline using the description and text after the {@code /by} delimiter. */
-    private static void addDeadline(String input, List<Task> tasks) {
-        String details = input.substring("deadline ".length());
-        int byIndex = details.indexOf(" /by ");
-        String description = details.substring(0, byIndex);
-        String by = details.substring(byIndex + " /by ".length());
+    private static void addDeadline(String input, List<Task> tasks) throws ChattyException {
+        String details = input.substring("deadline".length()).strip();
+        int byIndex = details.indexOf("/by");
+        if (byIndex < 0) {
+            throw new ChattyException("OOPS!!! A deadline needs '/by'. "
+                    + "Try: deadline DESCRIPTION /by DATE_OR_TIME");
+        }
+
+        String description = details.substring(0, byIndex).strip();
+        String by = details.substring(byIndex + "/by".length()).strip();
+        requireDescription(description, "deadline");
+        if (by.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me when the deadline is due after '/by'.");
+        }
         addTask(new Deadline(description, by), tasks);
     }
 
     /** Adds an event using the description and text after its time delimiters. */
-    private static void addEvent(String input, List<Task> tasks) {
-        String details = input.substring("event ".length());
-        int fromIndex = details.indexOf(" /from ");
-        int toIndex = details.indexOf(" /to ", fromIndex + " /from ".length());
-        String description = details.substring(0, fromIndex);
-        String from = details.substring(fromIndex + " /from ".length(), toIndex);
-        String to = details.substring(toIndex + " /to ".length());
+    private static void addEvent(String input, List<Task> tasks) throws ChattyException {
+        String details = input.substring("event".length()).strip();
+        int fromIndex = details.indexOf("/from");
+        if (fromIndex < 0) {
+            throw new ChattyException("OOPS!!! An event needs '/from' and '/to'. "
+                    + "Try: event DESCRIPTION /from START /to END");
+        }
+
+        int toIndex = details.indexOf("/to", fromIndex + "/from".length());
+        if (toIndex < 0) {
+            throw new ChattyException("OOPS!!! An event with '/from' also needs an ending value after '/to'.");
+        }
+
+        String description = details.substring(0, fromIndex).strip();
+        String from = details.substring(fromIndex + "/from".length(), toIndex).strip();
+        String to = details.substring(toIndex + "/to".length()).strip();
+        requireDescription(description, "event");
+        if (from.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me when the event starts after '/from'.");
+        } else if (to.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me when the event ends after '/to'.");
+        }
         addTask(new Event(description, from, to), tasks);
+    }
+
+    /** Throws a specific error when a task description is empty. */
+    private static void requireDescription(String description, String taskType) throws ChattyException {
+        if (description.isEmpty()) {
+            String article = taskType.equals("event") ? "an" : "a";
+            throw new ChattyException("OOPS!!! The description of " + article + " "
+                    + taskType + " cannot be empty.");
+        }
     }
 
     /** Adds a task and prints its details and the updated task count. */
@@ -121,20 +168,41 @@ public class Chatty {
     }
 
     /** Marks the task identified by a one-based task number as done. */
-    private static void markTask(String input, List<Task> tasks) {
-        int taskIndex = Integer.parseInt(input.substring("mark ".length())) - 1;
-        Task task = tasks.get(taskIndex);
+    private static void markTask(String input, List<Task> tasks) throws ChattyException {
+        Task task = getTask(input, "mark", tasks);
         task.markAsDone();
         System.out.println(" Nice! I've marked this task as done:");
         System.out.println("   " + task);
     }
 
     /** Marks the task identified by a one-based task number as not done. */
-    private static void unmarkTask(String input, List<Task> tasks) {
-        int taskIndex = Integer.parseInt(input.substring("unmark ".length())) - 1;
-        Task task = tasks.get(taskIndex);
+    private static void unmarkTask(String input, List<Task> tasks) throws ChattyException {
+        Task task = getTask(input, "unmark", tasks);
         task.markAsNotDone();
         System.out.println(" OK, I've marked this task as not done yet:");
         System.out.println("   " + task);
+    }
+
+    /** Returns the task selected by a command containing a one-based task number. */
+    private static Task getTask(String input, String command, List<Task> tasks) throws ChattyException {
+        String indexText = input.substring(command.length()).strip();
+        if (indexText.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me which task to " + command + ".");
+        }
+
+        int taskNumber;
+        try {
+            taskNumber = Integer.parseInt(indexText);
+        } catch (NumberFormatException exception) {
+            throw new ChattyException("OOPS!!! The task number must be a whole number.");
+        }
+
+        if (tasks.isEmpty()) {
+            throw new ChattyException("OOPS!!! Your task list is empty.");
+        } else if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new ChattyException("OOPS!!! Task " + taskNumber + " does not exist. "
+                    + "Choose a number from 1 to " + tasks.size() + ".");
+        }
+        return tasks.get(taskNumber - 1);
     }
 }
