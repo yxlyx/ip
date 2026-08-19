@@ -1,9 +1,11 @@
+import java.util.Scanner;
+
 /**
  * Starts the Chatty chatbot application.
  */
 public class Chatty {
     /**
-     * Runs Chatty and prints its greeting and farewell.
+     * Runs Chatty, echoes commands, and exits when the user enters {@code bye}.
      *
      * @param args command-line arguments; not used by Chatty
      */
@@ -21,6 +23,18 @@ public class Chatty {
         System.out.println(banner);
         System.out.println(welcome);
         System.out.println(horizontalLine);
-        System.out.println("Bye. Hope to see you again soon!");
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine();
+            System.out.println(horizontalLine);
+            if (input.equals("bye")) {
+                System.out.println(" Bye. Hope to see you again soon!");
+                System.out.println(horizontalLine);
+                break;
+            }
+            System.out.println(" " + input);
+            System.out.println(horizontalLine);
+        }
     }
 }
