@@ -69,6 +69,8 @@ public class Chatty {
                 markTask(input, tasks);
             } else if (isCommand(input, "unmark")) {
                 unmarkTask(input, tasks);
+            } else if (isCommand(input, "delete")) {
+                deleteTask(input, tasks);
             } else if (isCommand(input, "todo")) {
                 addTodo(input, tasks);
             } else if (isCommand(input, "deadline")) {
@@ -77,7 +79,7 @@ public class Chatty {
                 addEvent(input, tasks);
             } else {
                 throw new ChattyException("OOPS!!! I don't recognise that command. "
-                        + "Try todo, deadline, event, list, mark, unmark, or bye.");
+                        + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
             }
         } catch (ChattyException exception) {
             System.out.println(" " + exception.getMessage());
@@ -181,6 +183,15 @@ public class Chatty {
         task.markAsNotDone();
         System.out.println(" OK, I've marked this task as not done yet:");
         System.out.println("   " + task);
+    }
+
+    /** Deletes the task identified by a one-based task number. */
+    private static void deleteTask(String input, List<Task> tasks) throws ChattyException {
+        Task task = getTask(input, "delete", tasks);
+        tasks.remove(task);
+        System.out.println(" Noted. I've removed this task:");
+        System.out.println("   " + task);
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
     }
 
     /** Returns the task selected by a command containing a one-based task number. */

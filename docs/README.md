@@ -78,6 +78,19 @@ OK, I've marked this task as not done yet:
   [D][ ] return book (by: Sunday)
 ```
 
+## Deleting a task
+
+Enter `delete INDEX`, replacing `INDEX` with the task number shown by `list`.
+The remaining tasks are renumbered automatically.
+
+Example: `delete 2`
+
+```text
+Noted. I've removed this task:
+  [D][ ] return book (by: Sunday)
+Now you have 2 tasks in the list.
+```
+
 ## Handling invalid input
 
 Chatty explains invalid commands instead of stopping unexpectedly. Error
@@ -88,8 +101,8 @@ For example, a todo must have a description:
 OOPS!!! The description of a todo cannot be empty.
 ```
 
-Task numbers used with `mark` and `unmark` must be whole numbers that appear in
-the current list. Deadline and event commands must include all documented
+Task numbers used with `mark`, `unmark`, and `delete` must be whole numbers
+that appear in the current list. Deadline and event commands must include all documented
 delimiters and values.
 
 ## Exiting Chatty
