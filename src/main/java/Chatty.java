@@ -5,7 +5,7 @@ import java.util.Scanner;
  */
 public class Chatty {
     /**
-     * Runs Chatty, echoes commands, and exits when the user enters {@code bye}.
+     * Runs Chatty, stores tasks, lists them on request, and exits when the user enters {@code bye}.
      *
      * @param args command-line arguments; not used by Chatty
      */
@@ -24,6 +24,8 @@ public class Chatty {
         System.out.println(welcome);
         System.out.println(horizontalLine);
 
+        String[] tasks = new String[100];
+        int taskCount = 0;
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String input = scanner.nextLine();
@@ -33,7 +35,15 @@ public class Chatty {
                 System.out.println(horizontalLine);
                 break;
             }
-            System.out.println(" " + input);
+            if (input.equals("list")) {
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println(" " + (i + 1) + ". " + tasks[i]);
+                }
+            } else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println(" added: " + input);
+            }
             System.out.println(horizontalLine);
         }
     }
