@@ -56,28 +56,36 @@ public class Chatty {
     private static boolean processCommand(String rawInput, List<Task> tasks) {
         String input = rawInput.strip();
         System.out.println(HORIZONTAL_LINE);
-        if (input.equals("bye")) {
-            System.out.println(" Bye. Hope to see you again soon!");
-            System.out.println(HORIZONTAL_LINE);
-            return false;
-        }
-
+        CommandType command = CommandType.fromInput(input);
         try {
-            if (input.equals("list")) {
+            switch (command) {
+            case BYE:
+                System.out.println(" Bye. Hope to see you again soon!");
+                System.out.println(HORIZONTAL_LINE);
+                return false;
+            case LIST:
                 printTaskList(tasks);
-            } else if (isCommand(input, "mark")) {
+                break;
+            case MARK:
                 markTask(input, tasks);
-            } else if (isCommand(input, "unmark")) {
+                break;
+            case UNMARK:
                 unmarkTask(input, tasks);
-            } else if (isCommand(input, "delete")) {
+                break;
+            case DELETE:
                 deleteTask(input, tasks);
-            } else if (isCommand(input, "todo")) {
+                break;
+            case TODO:
                 addTodo(input, tasks);
-            } else if (isCommand(input, "deadline")) {
+                break;
+            case DEADLINE:
                 addDeadline(input, tasks);
-            } else if (isCommand(input, "event")) {
+                break;
+            case EVENT:
                 addEvent(input, tasks);
-            } else {
+                break;
+            case UNKNOWN:
+            default:
                 throw new ChattyException("OOPS!!! I don't recognise that command. "
                         + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
             }
@@ -86,11 +94,6 @@ public class Chatty {
         }
         System.out.println(HORIZONTAL_LINE);
         return true;
-    }
-
-    /** Returns whether the input is the given command, optionally followed by arguments. */
-    private static boolean isCommand(String input, String command) {
-        return input.equals(command) || input.startsWith(command + " ");
     }
 
     /** Adds a todo described by the text after the {@code todo} command. */
