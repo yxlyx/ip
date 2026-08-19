@@ -65,12 +65,51 @@ public class Chatty {
             markTask(input, tasks);
         } else if (input.startsWith("unmark ")) {
             unmarkTask(input, tasks);
+        } else if (input.startsWith("todo ")) {
+            addTodo(input, tasks);
+        } else if (input.startsWith("deadline ")) {
+            addDeadline(input, tasks);
+        } else if (input.startsWith("event ")) {
+            addEvent(input, tasks);
         } else {
-            tasks.add(new Task(input));
-            System.out.println(" added: " + input);
+            addTask(new Task(input, "T", ""), tasks);
         }
         System.out.println(HORIZONTAL_LINE);
         return true;
+    }
+
+    /** Adds a todo described by the text after the {@code todo} command. */
+    private static void addTodo(String input, List<Task> tasks) {
+        String description = input.substring("todo ".length());
+        addTask(new Task(description, "T", ""), tasks);
+    }
+
+    /** Adds a deadline using the description and text after the {@code /by} delimiter. */
+    private static void addDeadline(String input, List<Task> tasks) {
+        String details = input.substring("deadline ".length());
+        int byIndex = details.indexOf(" /by ");
+        String description = details.substring(0, byIndex);
+        String by = details.substring(byIndex + " /by ".length());
+        addTask(new Task(description, "D", " (by: " + by + ")"), tasks);
+    }
+
+    /** Adds an event using the description and text after its time delimiters. */
+    private static void addEvent(String input, List<Task> tasks) {
+        String details = input.substring("event ".length());
+        int fromIndex = details.indexOf(" /from ");
+        int toIndex = details.indexOf(" /to ", fromIndex + " /from ".length());
+        String description = details.substring(0, fromIndex);
+        String from = details.substring(fromIndex + " /from ".length(), toIndex);
+        String to = details.substring(toIndex + " /to ".length());
+        addTask(new Task(description, "E", " (from: " + from + " to: " + to + ")"), tasks);
+    }
+
+    /** Adds a task and prints its details and the updated task count. */
+    private static void addTask(Task task, List<Task> tasks) {
+        tasks.add(task);
+        System.out.println(" Got it. I've added this task:");
+        System.out.println("   " + task);
+        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
     }
 
     /** Prints all tasks with their numbers and completion statuses. */

@@ -8,14 +8,24 @@ public class Task {
     /** Whether this task has been completed. */
     protected boolean isDone;
 
+    /** Symbol identifying this task's type. */
+    private final String typeIcon;
+
+    /** Date or time information displayed after the description. */
+    private final String timingDetails;
+
     /**
-     * Creates an incomplete task with the given description.
+     * Creates an incomplete task of the specified type.
      *
      * @param description description of the task
+     * @param typeIcon symbol identifying the task type
+     * @param timingDetails formatted date or time information
      */
-    public Task(String description) {
+    public Task(String description, String typeIcon, String timingDetails) {
         this.description = description;
         this.isDone = false;
+        this.typeIcon = typeIcon;
+        this.timingDetails = timingDetails;
     }
 
     /**
@@ -38,12 +48,12 @@ public class Task {
     }
 
     /**
-     * Returns this task's status icon and description for display.
+     * Returns this task's type, status, description, and timing details.
      *
-     * @return formatted task status and description
+     * @return formatted task information
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + typeIcon + "][" + getStatusIcon() + "] " + description + timingDetails;
     }
 }
