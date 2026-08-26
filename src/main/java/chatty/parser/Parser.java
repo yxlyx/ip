@@ -78,6 +78,21 @@ public class Parser {
     }
 
     /**
+     * Returns the keyword supplied to a find command.
+     *
+     * @param input normalized find command.
+     * @return keyword to search for.
+     * @throws ChattyException if the keyword is absent.
+     */
+    public static String parseFindKeyword(String input) throws ChattyException {
+        String keyword = input.substring(CommandType.FIND.getKeyword().length()).strip();
+        if (keyword.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me what keyword to find.");
+        }
+        return keyword;
+    }
+
+    /**
      * Creates a todo from its command arguments.
      *
      * @param input normalized todo command.

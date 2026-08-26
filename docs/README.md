@@ -56,6 +56,19 @@ Here are the tasks in your list:
 3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
 ```
 
+## Finding tasks
+
+Enter `find KEYWORD` to display tasks whose descriptions contain that keyword.
+Matches retain their existing order and are numbered within the search results.
+
+Example: `find book`
+
+```text
+Here are the matching tasks in your list:
+1.[T][ ] borrow book
+2.[D][ ] return book (by: Sunday)
+```
+
 ## Marking a task as done
 
 Enter `mark INDEX`, replacing `INDEX` with the task number shown by `list`.

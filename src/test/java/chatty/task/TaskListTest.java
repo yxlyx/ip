@@ -32,6 +32,28 @@ public class TaskListTest {
                 () -> taskList.getTasks().add(new Todo("write notes")));
     }
 
+    /** Verifies that finding a keyword returns matching tasks in their existing order. */
+    @Test
+    public void find_matchingKeyword_matchingTasksReturnedInOrder() {
+        Todo firstMatch = new Todo("read book");
+        Todo nonMatch = new Todo("write notes");
+        Todo secondMatch = new Todo("return book");
+        TaskList taskList = new TaskList(List.of(firstMatch, nonMatch, secondMatch));
+
+        List<Task> matchingTasks = taskList.find("book");
+
+        assertEquals(List.of(firstMatch, secondMatch), matchingTasks);
+        assertEquals(3, taskList.size());
+    }
+
+    /** Verifies that finding an absent keyword returns an empty list. */
+    @Test
+    public void find_nonMatchingKeyword_emptyListReturned() {
+        TaskList taskList = new TaskList(List.of(new Todo("read book")));
+
+        assertTrue(taskList.find("notes").isEmpty());
+    }
+
     /**
      * Verifies that marking and unmarking a valid task changes its completion state.
      *
