@@ -75,6 +75,9 @@ public class Chatty {
                 case LIST:
                     ui.showTaskList(tasks.getTasks());
                     break;
+                case FIND:
+                    ui.showMatchingTasks(tasks.find(Parser.parseFindKeyword(input)));
+                    break;
                 case MARK:
                     Task markedTask = tasks.mark(Parser.parseTaskNumber(input, command));
                     ui.showTaskMarked(markedTask);
@@ -102,7 +105,7 @@ public class Chatty {
                     break;
                 default:
                     throw new ChattyException("OOPS!!! I don't recognise that command. "
-                            + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
+                            + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
             }
         } catch (ChattyException exception) {
             ui.showError(exception.getMessage());

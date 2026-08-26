@@ -23,6 +23,7 @@ public class ParserTest {
     public void parseCommand_supportedInputs_correctCommandTypes() {
         assertEquals(CommandType.BYE, Parser.parseCommand("bye"));
         assertEquals(CommandType.LIST, Parser.parseCommand("list"));
+        assertEquals(CommandType.FIND, Parser.parseCommand("find book"));
         assertEquals(CommandType.MARK, Parser.parseCommand("mark 2"));
         assertEquals(CommandType.UNMARK, Parser.parseCommand("unmark 2"));
         assertEquals(CommandType.DELETE, Parser.parseCommand("delete 2"));
@@ -40,6 +41,22 @@ public class ParserTest {
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("list everything"));
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("goodbye"));
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("todos read book"));
+    }
+
+    /**
+     * Verifies that a valid find command returns its stripped keyword.
+     *
+     * @throws ChattyException if a valid keyword is rejected unexpectedly.
+     */
+    @Test
+    public void parseFindKeyword_validKeyword_keywordReturned() throws ChattyException {
+        assertEquals("book", Parser.parseFindKeyword("find   book"));
+    }
+
+    /** Verifies that a find command without a keyword raises {@link ChattyException}. */
+    @Test
+    public void parseFindKeyword_missingKeyword_exceptionThrown() {
+        assertThrows(ChattyException.class, () -> Parser.parseFindKeyword("find"));
     }
 
     /**
