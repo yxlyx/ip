@@ -32,8 +32,8 @@ public class Chatty {
      */
     public static void main(String[] args) {
         printGreeting();
-        List<Task> tasks = new ArrayList<>();
         Storage storage = new Storage(Path.of("data", "chatty.txt"));
+        List<Task> tasks = loadTasks(storage);
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine() && processCommand(scanner.nextLine(), tasks, storage)) {
             // Continue processing commands until the input ends or the user exits.
@@ -46,6 +46,16 @@ public class Chatty {
         System.out.println(BANNER);
         System.out.println(WELCOME);
         System.out.println(HORIZONTAL_LINE);
+    }
+
+    /** Loads saved tasks, or starts with an empty list if loading fails. */
+    private static List<Task> loadTasks(Storage storage) {
+        try {
+            return storage.loadTasks();
+        } catch (ChattyException exception) {
+            System.out.println(" " + exception.getMessage());
+            return new ArrayList<>();
+        }
     }
 
     /**
