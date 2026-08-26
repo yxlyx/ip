@@ -1,5 +1,13 @@
+package chatty.parser;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+
+import chatty.exception.ChattyException;
+import chatty.task.Deadline;
+import chatty.task.Event;
+import chatty.task.Task;
+import chatty.task.Todo;
 
 /**
  * Interprets user input as commands, tasks, and task numbers.

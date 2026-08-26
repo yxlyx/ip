@@ -1,6 +1,10 @@
+package chatty.task;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import chatty.exception.ChattyException;
 
 /**
  * Owns the task collection and provides operations that modify it.

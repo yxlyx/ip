@@ -1,5 +1,9 @@
+package chatty.ui;
+
 import java.util.List;
 import java.util.Scanner;
+
+import chatty.task.Task;
 
 /**
  * Handles console input and presents Chatty's responses to the user.
