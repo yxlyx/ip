@@ -10,7 +10,7 @@ public class ChattyException extends Exception {
     /**
      * Creates a Chatty-specific exception with an explanation for the user.
      *
-     * @param message explanation of the invalid input or operation
+     * @param message explanation of the invalid input or operation.
      */
     public ChattyException(String message) {
         super(message);

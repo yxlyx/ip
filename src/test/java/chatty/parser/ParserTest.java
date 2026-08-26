@@ -18,6 +18,7 @@ import chatty.task.Todo;
  * Tests command, task, and task-number parsing behavior.
  */
 public class ParserTest {
+    /** Verifies that supported command inputs map to their command types. */
     @Test
     public void parseCommand_supportedInputs_correctCommandTypes() {
         assertEquals(CommandType.BYE, Parser.parseCommand("bye"));
@@ -32,6 +33,7 @@ public class ParserTest {
                 Parser.parseCommand("event meeting /from 2pm /to 4pm"));
     }
 
+    /** Verifies that unsupported command inputs map to {@link CommandType#UNKNOWN}. */
     @Test
     public void parseCommand_unsupportedInputs_unknownCommand() {
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand(""));
@@ -40,6 +42,11 @@ public class ParserTest {
         assertEquals(CommandType.UNKNOWN, Parser.parseCommand("todos read book"));
     }
 
+    /**
+     * Verifies that valid add commands create tasks with all supplied details.
+     *
+     * @throws ChattyException if a valid command is rejected unexpectedly.
+     */
     @Test
     public void parseTask_validAddCommands_tasksCreatedWithDetails() throws ChattyException {
         Task parsedTodo = Parser.parseTask("todo read book", CommandType.TODO);
@@ -60,6 +67,7 @@ public class ParserTest {
         assertEquals("4pm", event.getTo());
     }
 
+    /** Verifies that missing or invalid task details raise {@link ChattyException}. */
     @Test
     public void parseTask_missingOrInvalidDetails_exceptionThrown() {
         assertThrows(ChattyException.class,
@@ -74,12 +82,18 @@ public class ParserTest {
                 () -> Parser.parseTask("list", CommandType.LIST));
     }
 
+    /**
+     * Verifies that valid task numbers are parsed as one-based integers.
+     *
+     * @throws ChattyException if a valid task number is rejected unexpectedly.
+     */
     @Test
     public void parseTaskNumber_validNumber_numberReturned() throws ChattyException {
         assertEquals(12, Parser.parseTaskNumber("mark 12", CommandType.MARK));
         assertEquals(3, Parser.parseTaskNumber("delete   3", CommandType.DELETE));
     }
 
+    /** Verifies that missing or non-integer task numbers raise {@link ChattyException}. */
     @Test
     public void parseTaskNumber_missingOrNonIntegerNumber_exceptionThrown() {
         assertThrows(ChattyException.class,

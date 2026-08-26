@@ -37,6 +37,12 @@ public enum CommandType {
     /** Whether the command can be followed by arguments. */
     private final boolean acceptsArguments;
 
+    /**
+     * Creates a command type with its keyword and argument policy.
+     *
+     * @param keyword keyword used to select the command.
+     * @param acceptsArguments whether the command accepts trailing arguments.
+     */
     CommandType(String keyword, boolean acceptsArguments) {
         this.keyword = keyword;
         this.acceptsArguments = acceptsArguments;
@@ -45,7 +51,7 @@ public enum CommandType {
     /**
      * Returns the keyword used to select this command.
      *
-     * @return command keyword
+     * @return command keyword.
      */
     public String getKeyword() {
         return keyword;
@@ -54,7 +60,7 @@ public enum CommandType {
     /**
      * Returns whether this command accepts text after its keyword.
      *
-     * @return true if command arguments are accepted
+     * @return {@code true} if command arguments are accepted.
      */
     public boolean acceptsArguments() {
         return acceptsArguments;

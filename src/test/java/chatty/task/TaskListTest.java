@@ -17,6 +17,7 @@ import chatty.exception.ChattyException;
  * Tests task collection mutations and one-based task selection.
  */
 public class TaskListTest {
+    /** Verifies that supplied tasks are copied and exposed through a read-only view. */
     @Test
     public void constructor_suppliedList_copiesTasksAndExposesReadOnlyView() {
         Todo originalTask = new Todo("read book");
@@ -31,6 +32,11 @@ public class TaskListTest {
                 () -> taskList.getTasks().add(new Todo("write notes")));
     }
 
+    /**
+     * Verifies that marking and unmarking a valid task changes its completion state.
+     *
+     * @throws ChattyException if a valid task number is rejected unexpectedly.
+     */
     @Test
     public void markAndUnmark_validTaskNumber_completionStateChanged() throws ChattyException {
         Todo firstTask = new Todo("read book");
@@ -49,6 +55,11 @@ public class TaskListTest {
         assertFalse(secondTask.isDone());
     }
 
+    /**
+     * Verifies that deleting a valid task removes and returns the selected task.
+     *
+     * @throws ChattyException if a valid task number is rejected unexpectedly.
+     */
     @Test
     public void delete_validTaskNumber_selectedTaskRemovedAndReturned() throws ChattyException {
         Todo firstTask = new Todo("read book");
@@ -61,6 +72,7 @@ public class TaskListTest {
         assertEquals(List.of(secondTask), taskList.getTasks());
     }
 
+    /** Verifies that empty and out-of-range task operations raise {@link ChattyException}. */
     @Test
     public void taskOperations_emptyOrOutOfRangeTaskNumber_exceptionThrown() {
         TaskList emptyTaskList = new TaskList();

@@ -13,9 +13,9 @@ public class Event extends Task {
     /**
      * Creates an incomplete event with the given description and time range.
      *
-     * @param description description of the event
-     * @param from date or time at which the event starts
-     * @param to date or time at which the event ends
+     * @param description description of the event.
+     * @param from date or time at which the event starts.
+     * @param to date or time at which the event ends.
      */
     public Event(String description, String from, String to) {
         super(description);
@@ -23,6 +23,9 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getTypeIcon() {
         return "E";
@@ -31,7 +34,7 @@ public class Event extends Task {
     /**
      * Returns the date or time at which this event starts.
      *
-     * @return event start value
+     * @return event start value.
      */
     public String getFrom() {
         return from;
@@ -40,12 +43,17 @@ public class Event extends Task {
     /**
      * Returns the date or time at which this event ends.
      *
-     * @return event end value
+     * @return event end value.
      */
     public String getTo() {
         return to;
     }
 
+    /**
+     * Returns this event with its start and end values.
+     *
+     * @return formatted event information.
+     */
     @Override
     public String toString() {
         return super.toString() + " (from: " + from + " to: " + to + ")";
