@@ -45,14 +45,14 @@ public class Parser {
      */
     public static Task parseTask(String input, CommandType command) throws ChattyException {
         switch (command) {
-        case TODO:
-            return parseTodo(input);
-        case DEADLINE:
-            return parseDeadline(input);
-        case EVENT:
-            return parseEvent(input);
-        default:
-            throw new ChattyException("OOPS!!! That command does not create a task.");
+            case TODO:
+                return parseTodo(input);
+            case DEADLINE:
+                return parseDeadline(input);
+            case EVENT:
+                return parseEvent(input);
+            default:
+                throw new ChattyException("OOPS!!! That command does not create a task.");
         }
     }
 

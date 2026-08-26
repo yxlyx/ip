@@ -108,30 +108,30 @@ public class Storage {
 
         Task task;
         switch (fields[0]) {
-        case "T":
-            requireFields(fields, 3, lineNumber);
-            task = new Todo(fields[2]);
-            break;
-        case "D":
-            requireFields(fields, 4, lineNumber);
-            if (fields[3].isBlank()) {
+            case "T":
+                requireFields(fields, 3, lineNumber);
+                task = new Todo(fields[2]);
+                break;
+            case "D":
+                requireFields(fields, 4, lineNumber);
+                if (fields[3].isBlank()) {
+                    throw invalidRecord(lineNumber);
+                }
+                try {
+                    task = new Deadline(fields[2], LocalDate.parse(fields[3]));
+                } catch (DateTimeParseException exception) {
+                    throw invalidRecord(lineNumber);
+                }
+                break;
+            case "E":
+                requireFields(fields, 5, lineNumber);
+                if (fields[3].isBlank() || fields[4].isBlank()) {
+                    throw invalidRecord(lineNumber);
+                }
+                task = new Event(fields[2], fields[3], fields[4]);
+                break;
+            default:
                 throw invalidRecord(lineNumber);
-            }
-            try {
-                task = new Deadline(fields[2], LocalDate.parse(fields[3]));
-            } catch (DateTimeParseException exception) {
-                throw invalidRecord(lineNumber);
-            }
-            break;
-        case "E":
-            requireFields(fields, 5, lineNumber);
-            if (fields[3].isBlank() || fields[4].isBlank()) {
-                throw invalidRecord(lineNumber);
-            }
-            task = new Event(fields[2], fields[3], fields[4]);
-            break;
-        default:
-            throw invalidRecord(lineNumber);
         }
 
         if (isDone) {
