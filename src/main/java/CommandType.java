@@ -41,20 +41,20 @@ public enum CommandType {
     }
 
     /**
-     * Returns the command type represented by the given input.
+     * Returns the keyword used to select this command.
      *
-     * @param input normalized user input
-     * @return matching command type, or {@link #UNKNOWN} when no command matches
+     * @return command keyword
      */
-    public static CommandType fromInput(String input) {
-        for (CommandType command : values()) {
-            boolean isExactMatch = input.equals(command.keyword);
-            boolean hasAcceptedArguments = command.acceptsArguments
-                    && input.startsWith(command.keyword + " ");
-            if (isExactMatch || hasAcceptedArguments) {
-                return command;
-            }
-        }
-        return UNKNOWN;
+    public String getKeyword() {
+        return keyword;
+    }
+
+    /**
+     * Returns whether this command accepts text after its keyword.
+     *
+     * @return true if command arguments are accepted
+     */
+    public boolean acceptsArguments() {
+        return acceptsArguments;
     }
 }
