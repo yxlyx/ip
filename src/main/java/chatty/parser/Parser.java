@@ -20,7 +20,7 @@ public class Parser {
     /**
      * Returns the command type represented by the normalized input.
      *
-     * @param input normalized user input
+     * @param input normalized user input.
      * @return matching command type, or {@link CommandType#UNKNOWN} when no command matches
      */
     public static CommandType parseCommand(String input) {
@@ -38,29 +38,29 @@ public class Parser {
     /**
      * Creates a task from an add command and its arguments.
      *
-     * @param input normalized user input
-     * @param command type of task to create
+     * @param input normalized user input.
+     * @param command type of task to create.
      * @return task described by the command
      * @throws ChattyException if required task details are missing or invalid
      */
     public static Task parseTask(String input, CommandType command) throws ChattyException {
         switch (command) {
-        case TODO:
-            return parseTodo(input);
-        case DEADLINE:
-            return parseDeadline(input);
-        case EVENT:
-            return parseEvent(input);
-        default:
-            throw new ChattyException("OOPS!!! That command does not create a task.");
+            case TODO:
+                return parseTodo(input);
+            case DEADLINE:
+                return parseDeadline(input);
+            case EVENT:
+                return parseEvent(input);
+            default:
+                throw new ChattyException("OOPS!!! That command does not create a task.");
         }
     }
 
     /**
      * Returns the one-based task number supplied to a task operation.
      *
-     * @param input normalized user input
-     * @param command task operation being parsed
+     * @param input normalized user input.
+     * @param command task operation being parsed.
      * @return one-based task number
      * @throws ChattyException if the task number is absent or not a whole number
      */
