@@ -1,0 +1,92 @@
+package chatty.parser;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Test;
+
+import chatty.exception.ChattyException;
+import chatty.task.Deadline;
+import chatty.task.Event;
+import chatty.task.Task;
+import chatty.task.Todo;
+
+/**
+ * Tests command, task, and task-number parsing behavior.
+ */
+public class ParserTest {
+    @Test
+    public void parseCommand_supportedInputs_correctCommandTypes() {
+        assertEquals(CommandType.BYE, Parser.parseCommand("bye"));
+        assertEquals(CommandType.LIST, Parser.parseCommand("list"));
+        assertEquals(CommandType.MARK, Parser.parseCommand("mark 2"));
+        assertEquals(CommandType.UNMARK, Parser.parseCommand("unmark 2"));
+        assertEquals(CommandType.DELETE, Parser.parseCommand("delete 2"));
+        assertEquals(CommandType.TODO, Parser.parseCommand("todo read book"));
+        assertEquals(CommandType.DEADLINE,
+                Parser.parseCommand("deadline submit report /by 2026-10-15"));
+        assertEquals(CommandType.EVENT,
+                Parser.parseCommand("event meeting /from 2pm /to 4pm"));
+    }
+
+    @Test
+    public void parseCommand_unsupportedInputs_unknownCommand() {
+        assertEquals(CommandType.UNKNOWN, Parser.parseCommand(""));
+        assertEquals(CommandType.UNKNOWN, Parser.parseCommand("list everything"));
+        assertEquals(CommandType.UNKNOWN, Parser.parseCommand("goodbye"));
+        assertEquals(CommandType.UNKNOWN, Parser.parseCommand("todos read book"));
+    }
+
+    @Test
+    public void parseTask_validAddCommands_tasksCreatedWithDetails() throws ChattyException {
+        Task parsedTodo = Parser.parseTask("todo read book", CommandType.TODO);
+        Todo todo = assertInstanceOf(Todo.class, parsedTodo);
+        assertEquals("read book", todo.getDescription());
+
+        Task parsedDeadline = Parser.parseTask(
+                "deadline submit report /by 2026-10-15", CommandType.DEADLINE);
+        Deadline deadline = assertInstanceOf(Deadline.class, parsedDeadline);
+        assertEquals("submit report", deadline.getDescription());
+        assertEquals(LocalDate.of(2026, 10, 15), deadline.getBy());
+
+        Task parsedEvent = Parser.parseTask(
+                "event project meeting /from 2pm /to 4pm", CommandType.EVENT);
+        Event event = assertInstanceOf(Event.class, parsedEvent);
+        assertEquals("project meeting", event.getDescription());
+        assertEquals("2pm", event.getFrom());
+        assertEquals("4pm", event.getTo());
+    }
+
+    @Test
+    public void parseTask_missingOrInvalidDetails_exceptionThrown() {
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTask("todo", CommandType.TODO));
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTask("deadline submit report", CommandType.DEADLINE));
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTask("deadline submit report /by 2026-02-30", CommandType.DEADLINE));
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTask("event meeting /from 2pm", CommandType.EVENT));
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTask("list", CommandType.LIST));
+    }
+
+    @Test
+    public void parseTaskNumber_validNumber_numberReturned() throws ChattyException {
+        assertEquals(12, Parser.parseTaskNumber("mark 12", CommandType.MARK));
+        assertEquals(3, Parser.parseTaskNumber("delete   3", CommandType.DELETE));
+    }
+
+    @Test
+    public void parseTaskNumber_missingOrNonIntegerNumber_exceptionThrown() {
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTaskNumber("mark", CommandType.MARK));
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTaskNumber("delete two", CommandType.DELETE));
+        assertThrows(ChattyException.class,
+                () -> Parser.parseTaskNumber("unmark 1.5", CommandType.UNMARK));
+    }
+}
