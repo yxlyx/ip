@@ -28,7 +28,7 @@ public class Storage {
     /**
      * Creates storage that writes tasks to the given path.
      *
-     * @param filePath relative path of the task data file
+     * @param filePath relative path of the task data file.
      */
     public Storage(Path filePath) {
         this.filePath = filePath;
@@ -37,8 +37,8 @@ public class Storage {
     /**
      * Loads tasks from the data file, or returns an empty list when it does not exist.
      *
-     * @return tasks restored from the data file
-     * @throws ChattyException if the data file cannot be read or contains an invalid record
+     * @return tasks restored from the data file.
+     * @throws ChattyException if the data file cannot be read or contains an invalid record.
      */
     public List<Task> loadTasks() throws ChattyException {
         if (Files.notExists(filePath)) {
@@ -63,8 +63,8 @@ public class Storage {
     /**
      * Replaces the data file contents with the current task list.
      *
-     * @param tasks tasks to save
-     * @throws ChattyException if the directory or data file cannot be written
+     * @param tasks tasks to save.
+     * @throws ChattyException if the directory or data file cannot be written.
      */
     public void saveTasks(List<Task> tasks) throws ChattyException {
         try {
@@ -83,7 +83,14 @@ public class Storage {
         }
     }
 
-    /** Restores one task from a delimited storage record. */
+    /**
+     * Restores one task from a delimited storage record.
+     *
+     * @param record delimited task record.
+     * @param lineNumber one-based line number of the record.
+     * @return task restored from the record.
+     * @throws ChattyException if the record is malformed.
+     */
     private Task parseTask(String record, int lineNumber) throws ChattyException {
         String[] fields = record.split("\\s*\\|\\s*", -1);
         if (fields.length < 3 || fields[2].isBlank()) {
@@ -133,19 +140,36 @@ public class Storage {
         return task;
     }
 
-    /** Ensures that a stored task record has the expected number of fields. */
+    /**
+     * Ensures that a stored task record has the expected number of fields.
+     *
+     * @param fields fields parsed from the record.
+     * @param expectedCount required number of fields.
+     * @param lineNumber one-based line number of the record.
+     * @throws ChattyException if the field count is incorrect.
+     */
     private void requireFields(String[] fields, int expectedCount, int lineNumber) throws ChattyException {
         if (fields.length != expectedCount) {
             throw invalidRecord(lineNumber);
         }
     }
 
-    /** Returns an error describing the location of a malformed stored task. */
+    /**
+     * Returns an error describing the location of a malformed stored task.
+     *
+     * @param lineNumber one-based line number of the malformed record.
+     * @return exception describing the malformed record.
+     */
     private ChattyException invalidRecord(int lineNumber) {
         return new ChattyException("OOPS!!! The data file is corrupted at line " + lineNumber + ".");
     }
 
-    /** Returns one task encoded as a delimited storage record. */
+    /**
+     * Returns one task encoded as a delimited storage record.
+     *
+     * @param task task to encode.
+     * @return delimited record representing the task.
+     */
     private String formatTask(Task task) {
         String status = task.isDone() ? "1" : "0";
         String record = task.getTypeIcon() + FIELD_SEPARATOR

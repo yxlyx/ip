@@ -26,9 +26,14 @@ import chatty.task.Todo;
  * Tests saving and restoring tasks through Chatty's text-file format.
  */
 public class StorageTest {
+    /** Temporary directory used for isolated storage-file tests. */
     @TempDir
     private Path tempDirectory;
 
+    /** Verifies that loading a missing data file returns an empty list.
+     *
+     * @throws ChattyException if loading the missing file fails unexpectedly.
+     */
     @Test
     public void loadTasks_missingFile_emptyListReturned() throws ChattyException {
         Storage storage = new Storage(tempDirectory.resolve("data/chatty.txt"));
@@ -36,6 +41,12 @@ public class StorageTest {
         assertTrue(storage.loadTasks().isEmpty());
     }
 
+    /**
+     * Verifies that saving and loading preserves all supported task data and status.
+     *
+     * @throws ChattyException if task storage fails unexpectedly.
+     * @throws IOException if reading the saved file fails unexpectedly.
+     */
     @Test
     public void saveAndLoadTasks_multipleTaskTypes_allDataAndStatusPreserved()
             throws ChattyException, IOException {
@@ -72,6 +83,12 @@ public class StorageTest {
         assertTrue(loadedEvent.isDone());
     }
 
+    /**
+     * Verifies that blank lines in a data file are ignored.
+     *
+     * @throws ChattyException if loading the valid data fails unexpectedly.
+     * @throws IOException if creating the test data file fails unexpectedly.
+     */
     @Test
     public void loadTasks_blankLines_blankLinesIgnored() throws ChattyException, IOException {
         Path filePath = tempDirectory.resolve("chatty.txt");
@@ -84,6 +101,11 @@ public class StorageTest {
         assertEquals("read book", loadedTasks.get(0).getDescription());
     }
 
+    /**
+     * Verifies that malformed records identify their one-based line number.
+     *
+     * @throws IOException if creating the malformed test data file fails unexpectedly.
+     */
     @Test
     public void loadTasks_malformedRecord_exceptionIdentifiesLine() throws IOException {
         Path filePath = tempDirectory.resolve("chatty.txt");

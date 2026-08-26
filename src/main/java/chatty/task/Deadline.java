@@ -18,14 +18,17 @@ public class Deadline extends Task {
     /**
      * Creates an incomplete deadline with the given description and due value.
      *
-     * @param description description of the deadline
-     * @param by date by which the task should be completed
+     * @param description description of the deadline.
+     * @param by date by which the task should be completed.
      */
     public Deadline(String description, LocalDate by) {
         super(description);
         this.by = by;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getTypeIcon() {
         return "D";
@@ -34,12 +37,17 @@ public class Deadline extends Task {
     /**
      * Returns the date by which this task should be completed.
      *
-     * @return deadline due date
+     * @return deadline due date.
      */
     public LocalDate getBy() {
         return by;
     }
 
+    /**
+     * Returns this deadline with its formatted due date.
+     *
+     * @return formatted deadline information.
+     */
     @Override
     public String toString() {
         return super.toString() + " (by: " + by.format(DISPLAY_FORMAT) + ")";

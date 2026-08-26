@@ -31,12 +31,20 @@ public class Ui {
         scanner = new Scanner(System.in);
     }
 
-    /** Returns whether another command is available. */
+    /**
+     * Returns whether another command is available.
+     *
+     * @return {@code true} when another command line is available.
+     */
     public boolean hasNextCommand() {
         return scanner.hasNextLine();
     }
 
-    /** Returns the next command entered by the user. */
+    /**
+     * Returns the next command entered by the user.
+     *
+     * @return next command line.
+     */
     public String readCommand() {
         return scanner.nextLine();
     }
@@ -60,12 +68,20 @@ public class Ui {
         showLine();
     }
 
-    /** Displays an error message to the user. */
+    /**
+     * Displays an error message to the user.
+     *
+     * @param message error message to display.
+     */
     public void showError(String message) {
         System.out.println(" " + message);
     }
 
-    /** Displays every task with its one-based list number. */
+    /**
+     * Displays every task with its one-based list number.
+     *
+     * @param tasks tasks to display.
+     */
     public void showTaskList(List<Task> tasks) {
         System.out.println(" Here are the tasks in your list:");
         for (int i = 0; i < tasks.size(); i++) {
@@ -73,26 +89,44 @@ public class Ui {
         }
     }
 
-    /** Displays confirmation that a task was added. */
+    /**
+     * Displays confirmation that a task was added.
+     *
+     * @param task task that was added.
+     * @param taskCount number of tasks after the addition.
+     */
     public void showTaskAdded(Task task, int taskCount) {
         System.out.println(" Got it. I've added this task:");
         System.out.println("   " + task);
         System.out.println(" Now you have " + taskCount + " tasks in the list.");
     }
 
-    /** Displays confirmation that a task was marked as done. */
+    /**
+     * Displays confirmation that a task was marked as done.
+     *
+     * @param task task that was marked as done.
+     */
     public void showTaskMarked(Task task) {
         System.out.println(" Nice! I've marked this task as done:");
         System.out.println("   " + task);
     }
 
-    /** Displays confirmation that a task was marked as not done. */
+    /**
+     * Displays confirmation that a task was marked as not done.
+     *
+     * @param task task that was marked as not done.
+     */
     public void showTaskUnmarked(Task task) {
         System.out.println(" OK, I've marked this task as not done yet:");
         System.out.println("   " + task);
     }
 
-    /** Displays confirmation that a task was deleted. */
+    /**
+     * Displays confirmation that a task was deleted.
+     *
+     * @param task task that was deleted.
+     * @param taskCount number of tasks after the deletion.
+     */
     public void showTaskDeleted(Task task, int taskCount) {
         System.out.println(" Noted. I've removed this task:");
         System.out.println("   " + task);

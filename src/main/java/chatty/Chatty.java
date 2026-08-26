@@ -26,7 +26,7 @@ public class Chatty {
     /**
      * Creates Chatty with a task data file at the given path.
      *
-     * @param filePath relative path of the task data file
+     * @param filePath relative path of the task data file.
      */
     public Chatty(Path filePath) {
         ui = new Ui();
@@ -43,7 +43,11 @@ public class Chatty {
         }
     }
 
-    /** Loads saved tasks, or starts with an empty list if loading fails. */
+    /**
+     * Loads saved tasks, or starts with an empty list if loading fails.
+     *
+     * @return loaded tasks, or an empty task list when loading fails.
+     */
     private TaskList loadTasks() {
         try {
             return new TaskList(storage.loadTasks());
@@ -56,8 +60,8 @@ public class Chatty {
     /**
      * Processes one user command and displays Chatty's response.
      *
-     * @param rawInput command entered by the user
-     * @return false if Chatty should exit, and true otherwise
+     * @param rawInput command entered by the user.
+     * @return false if Chatty should exit, and true otherwise.
      */
     private boolean processCommand(String rawInput) {
         String input = rawInput.strip();
@@ -106,7 +110,11 @@ public class Chatty {
         return true;
     }
 
-    /** Starts Chatty using its default relative data-file path. */
+    /**
+     * Starts Chatty using its default relative data-file path.
+     *
+     * @param args command-line arguments, which are not used.
+     */
     public static void main(String[] args) {
         new Chatty(Path.of("data", "chatty.txt")).run();
     }

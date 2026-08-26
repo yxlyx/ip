@@ -13,7 +13,7 @@ public abstract class Task {
     /**
      * Creates an incomplete task with the given description.
      *
-     * @param description description of the task
+     * @param description description of the task.
      */
     protected Task(String description) {
         this.description = description;
@@ -23,14 +23,14 @@ public abstract class Task {
     /**
      * Returns the symbol identifying this task's type.
      *
-     * @return task type symbol
+     * @return task type symbol.
      */
     public abstract String getTypeIcon();
 
     /**
      * Returns the symbol used to display this task's completion status.
      *
-     * @return {@code X} when done, or a space when not done
+     * @return {@code X} when done, or a space when not done.
      */
     public String getStatusIcon() {
         return isDone ? "X" : " ";
@@ -39,7 +39,7 @@ public abstract class Task {
     /**
      * Returns this task's description.
      *
-     * @return task description
+     * @return task description.
      */
     public String getDescription() {
         return description;
@@ -48,7 +48,7 @@ public abstract class Task {
     /**
      * Returns whether this task has been completed.
      *
-     * @return true if the task is completed
+     * @return {@code true} if the task is completed.
      */
     public boolean isDone() {
         return isDone;
@@ -67,7 +67,7 @@ public abstract class Task {
     /**
      * Returns this task's type, status, and description for display.
      *
-     * @return formatted task information
+     * @return formatted task information.
      */
     @Override
     public String toString() {

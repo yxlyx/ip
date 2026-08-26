@@ -20,8 +20,8 @@ public class Parser {
     /**
      * Returns the command type represented by the normalized input.
      *
-     * @param input normalized user input
-     * @return matching command type, or {@link CommandType#UNKNOWN} when no command matches
+     * @param input normalized user input.
+     * @return matching command type, or {@link CommandType#UNKNOWN} when no command matches.
      */
     public static CommandType parseCommand(String input) {
         for (CommandType command : CommandType.values()) {
@@ -38,10 +38,10 @@ public class Parser {
     /**
      * Creates a task from an add command and its arguments.
      *
-     * @param input normalized user input
-     * @param command type of task to create
-     * @return task described by the command
-     * @throws ChattyException if required task details are missing or invalid
+     * @param input normalized user input.
+     * @param command type of task to create.
+     * @return task described by the command.
+     * @throws ChattyException if required task details are missing or invalid.
      */
     public static Task parseTask(String input, CommandType command) throws ChattyException {
         switch (command) {
@@ -59,10 +59,10 @@ public class Parser {
     /**
      * Returns the one-based task number supplied to a task operation.
      *
-     * @param input normalized user input
-     * @param command task operation being parsed
-     * @return one-based task number
-     * @throws ChattyException if the task number is absent or not a whole number
+     * @param input normalized user input.
+     * @param command task operation being parsed.
+     * @return one-based task number.
+     * @throws ChattyException if the task number is absent or not a whole number.
      */
     public static int parseTaskNumber(String input, CommandType command) throws ChattyException {
         String indexText = input.substring(command.getKeyword().length()).strip();
@@ -77,14 +77,26 @@ public class Parser {
         }
     }
 
-    /** Creates a todo from its command arguments. */
+    /**
+     * Creates a todo from its command arguments.
+     *
+     * @param input normalized todo command.
+     * @return parsed todo.
+     * @throws ChattyException if the todo description is empty.
+     */
     private static Todo parseTodo(String input) throws ChattyException {
         String description = input.substring("todo".length()).strip();
         requireDescription(description, "todo");
         return new Todo(description);
     }
 
-    /** Creates a deadline from its description and ISO date. */
+    /**
+     * Creates a deadline from its description and ISO date.
+     *
+     * @param input normalized deadline command.
+     * @return parsed deadline.
+     * @throws ChattyException if the deadline details or date are invalid.
+     */
     private static Deadline parseDeadline(String input) throws ChattyException {
         String details = input.substring("deadline".length()).strip();
         int byIndex = details.indexOf("/by");
@@ -107,7 +119,13 @@ public class Parser {
         }
     }
 
-    /** Creates an event from its description and time range. */
+    /**
+     * Creates an event from its description and time range.
+     *
+     * @param input normalized event command.
+     * @return parsed event.
+     * @throws ChattyException if the event details are incomplete.
+     */
     private static Event parseEvent(String input) throws ChattyException {
         String details = input.substring("event".length()).strip();
         int fromIndex = details.indexOf("/from");
@@ -133,7 +151,13 @@ public class Parser {
         return new Event(description, from, to);
     }
 
-    /** Throws a specific error when a task description is empty. */
+    /**
+     * Throws a specific error when a task description is empty.
+     *
+     * @param description task description to validate.
+     * @param taskType task type used in the error message.
+     * @throws ChattyException if the description is empty.
+     */
     private static void requireDescription(String description, String taskType) throws ChattyException {
         if (description.isEmpty()) {
             String article = taskType.equals("event") ? "an" : "a";
