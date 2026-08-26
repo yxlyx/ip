@@ -3,26 +3,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Runs the Chatty chatbot application.
  */
 public class Chatty {
-    /** Line used to separate Chatty's responses from user input. */
-    private static final String HORIZONTAL_LINE = "____________________________________________________________";
-
-    /** Chatty's logo, displayed when the application starts. */
-    private static final String BANNER = "  ____ _           _   _         \n"
-            + " / ___| |__   __ _| |_| |_ _   _ \n"
-            + "| |   | '_ \\ / _` | __| __| | | |\n"
-            + "| |___| | | | (_| | |_| |_| |_| |\n"
-            + " \\____|_| |_|\\__,_|\\__|\\__|\\__, |\n"
-            + "                           |___/";
-
-    /** Greeting displayed after Chatty's logo. */
-    private static final String WELCOME = "Hello! I'm Chatty.\nWhat can I do for you?";
-
     /** Prevents instantiation of this application entry-point class. */
     private Chatty() {
     }
@@ -33,29 +18,21 @@ public class Chatty {
      * @param args command-line arguments; not used by Chatty
      */
     public static void main(String[] args) {
-        printGreeting();
+        Ui ui = new Ui();
+        ui.showGreeting();
         Storage storage = new Storage(Path.of("data", "chatty.txt"));
-        List<Task> tasks = loadTasks(storage);
-        Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine() && processCommand(scanner.nextLine(), tasks, storage)) {
+        List<Task> tasks = loadTasks(storage, ui);
+        while (ui.hasNextCommand() && processCommand(ui.readCommand(), tasks, storage, ui)) {
             // Continue processing commands until the input ends or the user exits.
         }
     }
 
-    /** Prints Chatty's startup banner and greeting. */
-    private static void printGreeting() {
-        System.out.println(HORIZONTAL_LINE);
-        System.out.println(BANNER);
-        System.out.println(WELCOME);
-        System.out.println(HORIZONTAL_LINE);
-    }
-
     /** Loads saved tasks, or starts with an empty list if loading fails. */
-    private static List<Task> loadTasks(Storage storage) {
+    private static List<Task> loadTasks(Storage storage, Ui ui) {
         try {
             return storage.loadTasks();
         } catch (ChattyException exception) {
-            System.out.println(" " + exception.getMessage());
+            ui.showError(exception.getMessage());
             return new ArrayList<>();
         }
     }
@@ -66,43 +43,43 @@ public class Chatty {
      * @param rawInput command entered by the user
      * @param tasks tasks stored during this Chatty session
      * @param storage storage used to save task changes
+     * @param ui user interface used to display responses
      * @return false if Chatty should exit, and true otherwise
      */
-    private static boolean processCommand(String rawInput, List<Task> tasks, Storage storage) {
+    private static boolean processCommand(String rawInput, List<Task> tasks, Storage storage, Ui ui) {
         String input = rawInput.strip();
-        System.out.println(HORIZONTAL_LINE);
+        ui.showLine();
         CommandType command = CommandType.fromInput(input);
         try {
             switch (command) {
             case BYE:
-                System.out.println(" Bye. Hope to see you again soon!");
-                System.out.println(HORIZONTAL_LINE);
+                ui.showExit();
                 return false;
             case LIST:
-                printTaskList(tasks);
+                ui.showTaskList(tasks);
                 break;
             case MARK:
-                markTask(input, tasks);
+                markTask(input, tasks, ui);
                 storage.saveTasks(tasks);
                 break;
             case UNMARK:
-                unmarkTask(input, tasks);
+                unmarkTask(input, tasks, ui);
                 storage.saveTasks(tasks);
                 break;
             case DELETE:
-                deleteTask(input, tasks);
+                deleteTask(input, tasks, ui);
                 storage.saveTasks(tasks);
                 break;
             case TODO:
-                addTodo(input, tasks);
+                addTodo(input, tasks, ui);
                 storage.saveTasks(tasks);
                 break;
             case DEADLINE:
-                addDeadline(input, tasks);
+                addDeadline(input, tasks, ui);
                 storage.saveTasks(tasks);
                 break;
             case EVENT:
-                addEvent(input, tasks);
+                addEvent(input, tasks, ui);
                 storage.saveTasks(tasks);
                 break;
             case UNKNOWN:
@@ -111,21 +88,21 @@ public class Chatty {
                         + "Try todo, deadline, event, list, mark, unmark, delete, or bye.");
             }
         } catch (ChattyException exception) {
-            System.out.println(" " + exception.getMessage());
+            ui.showError(exception.getMessage());
         }
-        System.out.println(HORIZONTAL_LINE);
+        ui.showLine();
         return true;
     }
 
     /** Adds a todo described by the text after the {@code todo} command. */
-    private static void addTodo(String input, List<Task> tasks) throws ChattyException {
+    private static void addTodo(String input, List<Task> tasks, Ui ui) throws ChattyException {
         String description = input.substring("todo".length()).strip();
         requireDescription(description, "todo");
-        addTask(new Todo(description), tasks);
+        addTask(new Todo(description), tasks, ui);
     }
 
     /** Adds a deadline using the description and text after the {@code /by} delimiter. */
-    private static void addDeadline(String input, List<Task> tasks) throws ChattyException {
+    private static void addDeadline(String input, List<Task> tasks, Ui ui) throws ChattyException {
         String details = input.substring("deadline".length()).strip();
         int byIndex = details.indexOf("/by");
         if (byIndex < 0) {
@@ -142,14 +119,14 @@ public class Chatty {
 
         try {
             LocalDate by = LocalDate.parse(byText);
-            addTask(new Deadline(description, by), tasks);
+            addTask(new Deadline(description, by), tasks, ui);
         } catch (DateTimeParseException exception) {
             throw new ChattyException("OOPS!!! Use YYYY-MM-DD for deadline dates, such as 2019-10-15.");
         }
     }
 
     /** Adds an event using the description and text after its time delimiters. */
-    private static void addEvent(String input, List<Task> tasks) throws ChattyException {
+    private static void addEvent(String input, List<Task> tasks, Ui ui) throws ChattyException {
         String details = input.substring("event".length()).strip();
         int fromIndex = details.indexOf("/from");
         if (fromIndex < 0) {
@@ -171,7 +148,7 @@ public class Chatty {
         } else if (to.isEmpty()) {
             throw new ChattyException("OOPS!!! Tell me when the event ends after '/to'.");
         }
-        addTask(new Event(description, from, to), tasks);
+        addTask(new Event(description, from, to), tasks, ui);
     }
 
     /** Throws a specific error when a task description is empty. */
@@ -184,44 +161,30 @@ public class Chatty {
     }
 
     /** Adds a task and prints its details and the updated task count. */
-    private static void addTask(Task task, List<Task> tasks) {
+    private static void addTask(Task task, List<Task> tasks, Ui ui) {
         tasks.add(task);
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
-    }
-
-    /** Prints all tasks with their numbers and completion statuses. */
-    private static void printTaskList(List<Task> tasks) {
-        System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
-        }
+        ui.showTaskAdded(task, tasks.size());
     }
 
     /** Marks the task identified by a one-based task number as done. */
-    private static void markTask(String input, List<Task> tasks) throws ChattyException {
+    private static void markTask(String input, List<Task> tasks, Ui ui) throws ChattyException {
         Task task = getTask(input, "mark", tasks);
         task.markAsDone();
-        System.out.println(" Nice! I've marked this task as done:");
-        System.out.println("   " + task);
+        ui.showTaskMarked(task);
     }
 
     /** Marks the task identified by a one-based task number as not done. */
-    private static void unmarkTask(String input, List<Task> tasks) throws ChattyException {
+    private static void unmarkTask(String input, List<Task> tasks, Ui ui) throws ChattyException {
         Task task = getTask(input, "unmark", tasks);
         task.markAsNotDone();
-        System.out.println(" OK, I've marked this task as not done yet:");
-        System.out.println("   " + task);
+        ui.showTaskUnmarked(task);
     }
 
     /** Deletes the task identified by a one-based task number. */
-    private static void deleteTask(String input, List<Task> tasks) throws ChattyException {
+    private static void deleteTask(String input, List<Task> tasks, Ui ui) throws ChattyException {
         Task task = getTask(input, "delete", tasks);
         tasks.remove(task);
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + tasks.size() + " tasks in the list.");
+        ui.showTaskDeleted(task, tasks.size());
     }
 
     /** Returns the task selected by a command containing a one-based task number. */
