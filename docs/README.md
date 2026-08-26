@@ -1,7 +1,7 @@
 # Chatty User Guide
 
 Chatty is a command-line task manager that keeps track of todos, deadlines,
-and events during the current application session.
+and events across application sessions.
 
 ## Adding a todo
 
@@ -113,4 +113,6 @@ Enter `bye` to close Chatty.
 Bye. Hope to see you again soon!
 ```
 
-Chatty does not save tasks after the application exits.
+Chatty saves every task change to `data/chatty.txt` and restores the task list
+when the application starts. The data directory and file are created automatically
+when the first task change is saved.

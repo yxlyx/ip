@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -31,9 +32,10 @@ public class Chatty {
      */
     public static void main(String[] args) {
         printGreeting();
-        List<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage(Path.of("data", "chatty.txt"));
+        List<Task> tasks = loadTasks(storage);
         Scanner scanner = new Scanner(System.in);
-        while (scanner.hasNextLine() && processCommand(scanner.nextLine(), tasks)) {
+        while (scanner.hasNextLine() && processCommand(scanner.nextLine(), tasks, storage)) {
             // Continue processing commands until the input ends or the user exits.
         }
     }
@@ -46,14 +48,25 @@ public class Chatty {
         System.out.println(HORIZONTAL_LINE);
     }
 
+    /** Loads saved tasks, or starts with an empty list if loading fails. */
+    private static List<Task> loadTasks(Storage storage) {
+        try {
+            return storage.loadTasks();
+        } catch (ChattyException exception) {
+            System.out.println(" " + exception.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
     /**
      * Processes one user command and prints Chatty's response.
      *
      * @param rawInput command entered by the user
      * @param tasks tasks stored during this Chatty session
+     * @param storage storage used to save task changes
      * @return false if Chatty should exit, and true otherwise
      */
-    private static boolean processCommand(String rawInput, List<Task> tasks) {
+    private static boolean processCommand(String rawInput, List<Task> tasks, Storage storage) {
         String input = rawInput.strip();
         System.out.println(HORIZONTAL_LINE);
         CommandType command = CommandType.fromInput(input);
@@ -68,21 +81,27 @@ public class Chatty {
                 break;
             case MARK:
                 markTask(input, tasks);
+                storage.saveTasks(tasks);
                 break;
             case UNMARK:
                 unmarkTask(input, tasks);
+                storage.saveTasks(tasks);
                 break;
             case DELETE:
                 deleteTask(input, tasks);
+                storage.saveTasks(tasks);
                 break;
             case TODO:
                 addTodo(input, tasks);
+                storage.saveTasks(tasks);
                 break;
             case DEADLINE:
                 addDeadline(input, tasks);
+                storage.saveTasks(tasks);
                 break;
             case EVENT:
                 addEvent(input, tasks);
+                storage.saveTasks(tasks);
                 break;
             case UNKNOWN:
             default:
