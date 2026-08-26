@@ -17,15 +17,15 @@ Now you have 1 tasks in the list.
 
 ## Adding a deadline
 
-Enter `deadline DESCRIPTION /by DATE_OR_TIME` to add a task that must be
-completed before the given date or time. Chatty stores the date or time exactly
-as entered.
+Enter `deadline DESCRIPTION /by YYYY-MM-DD` to add a task that must be
+completed by a specific date. Chatty validates the date and displays it in a
+more readable format.
 
-Example: `deadline return book /by Sunday`
+Example: `deadline return book /by 2019-10-15`
 
 ```text
 Got it. I've added this task:
-  [D][ ] return book (by: Sunday)
+  [D][ ] return book (by: Oct 15 2019)
 Now you have 2 tasks in the list.
 ```
 
@@ -103,7 +103,8 @@ OOPS!!! The description of a todo cannot be empty.
 
 Task numbers used with `mark`, `unmark`, and `delete` must be whole numbers
 that appear in the current list. Deadline and event commands must include all documented
-delimiters and values.
+delimiters and values. Deadline dates must use `YYYY-MM-DD` and must represent
+valid calendar dates.
 
 ## Exiting Chatty
 
