@@ -1,4 +1,6 @@
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -132,12 +134,18 @@ public class Chatty {
         }
 
         String description = details.substring(0, byIndex).strip();
-        String by = details.substring(byIndex + "/by".length()).strip();
+        String byText = details.substring(byIndex + "/by".length()).strip();
         requireDescription(description, "deadline");
-        if (by.isEmpty()) {
+        if (byText.isEmpty()) {
             throw new ChattyException("OOPS!!! Tell me when the deadline is due after '/by'.");
         }
-        addTask(new Deadline(description, by), tasks);
+
+        try {
+            LocalDate by = LocalDate.parse(byText);
+            addTask(new Deadline(description, by), tasks);
+        } catch (DateTimeParseException exception) {
+            throw new ChattyException("OOPS!!! Use YYYY-MM-DD for deadline dates, such as 2019-10-15.");
+        }
     }
 
     /** Adds an event using the description and text after its time delimiters. */
