@@ -1,3 +1,5 @@
+package chatty.parser;
+
 /**
  * Identifies the commands understood by Chatty.
  */

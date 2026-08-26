@@ -1,4 +1,14 @@
+package chatty;
+
 import java.nio.file.Path;
+
+import chatty.exception.ChattyException;
+import chatty.parser.CommandType;
+import chatty.parser.Parser;
+import chatty.storage.Storage;
+import chatty.task.Task;
+import chatty.task.TaskList;
+import chatty.ui.Ui;
 
 /**
  * Coordinates Chatty's user interface, command parsing, task list, and storage.

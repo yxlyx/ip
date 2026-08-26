@@ -1,3 +1,5 @@
+package chatty.exception;
+
 /**
  * Represents an invalid command or task operation specific to Chatty.
  */
