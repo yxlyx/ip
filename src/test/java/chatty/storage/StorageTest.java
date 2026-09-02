@@ -30,7 +30,8 @@ public class StorageTest {
     @TempDir
     private Path tempDirectory;
 
-    /** Verifies that loading a missing data file returns an empty list.
+    /**
+     * Verifies that loading a missing data file returns an empty list.
      *
      * @throws ChattyException if loading the missing file fails unexpectedly.
      */
