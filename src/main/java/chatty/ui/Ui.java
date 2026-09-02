@@ -51,10 +51,7 @@ public class Ui {
 
     /** Displays Chatty's startup banner and greeting. */
     public void showGreeting() {
-        showLine();
-        System.out.println(BANNER);
-        System.out.println(WELCOME);
-        showLine();
+        printLines(HORIZONTAL_LINE, BANNER, WELCOME, HORIZONTAL_LINE);
     }
 
     /** Displays the line that separates responses from user input. */
@@ -64,8 +61,7 @@ public class Ui {
 
     /** Displays Chatty's farewell response and its closing separator. */
     public void showExit() {
-        System.out.println(" Bye. Hope to see you again soon!");
-        showLine();
+        printLines(" Bye. Hope to see you again soon!", HORIZONTAL_LINE);
     }
 
     /**
@@ -108,9 +104,10 @@ public class Ui {
      * @param taskCount number of tasks after the addition.
      */
     public void showTaskAdded(Task task, int taskCount) {
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        printLines(
+                " Got it. I've added this task:",
+                "   " + task,
+                " Now you have " + taskCount + " tasks in the list.");
     }
 
     /**
@@ -119,8 +116,7 @@ public class Ui {
      * @param task task that was marked as done.
      */
     public void showTaskMarked(Task task) {
-        System.out.println(" Nice! I've marked this task as done:");
-        System.out.println("   " + task);
+        printLines(" Nice! I've marked this task as done:", "   " + task);
     }
 
     /**
@@ -129,8 +125,7 @@ public class Ui {
      * @param task task that was marked as not done.
      */
     public void showTaskUnmarked(Task task) {
-        System.out.println(" OK, I've marked this task as not done yet:");
-        System.out.println("   " + task);
+        printLines(" OK, I've marked this task as not done yet:", "   " + task);
     }
 
     /**
@@ -140,8 +135,20 @@ public class Ui {
      * @param taskCount number of tasks after the deletion.
      */
     public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+        printLines(
+                " Noted. I've removed this task:",
+                "   " + task,
+                " Now you have " + taskCount + " tasks in the list.");
+    }
+
+    /**
+     * Displays each supplied line in order.
+     *
+     * @param lines response lines to display.
+     */
+    private void printLines(String... lines) {
+        for (String line : lines) {
+            System.out.println(line);
+        }
     }
 }
