@@ -31,15 +31,20 @@ public class Chatty {
     public Chatty(Path filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
-        tasks = new TaskList();
+        tasks = loadTasks();
     }
 
     /** Runs Chatty until input ends or the user enters {@code bye}. */
     public void run() {
         ui.showGreeting();
-        tasks = loadTasks();
-        while (ui.hasNextCommand() && processCommand(ui.readCommand())) {
-            // Continue processing commands until the input ends or the user exits.
+        while (ui.hasNextCommand()) {
+            String input = ui.readCommand();
+            ui.showLine();
+            ui.showResponse(getResponse(input));
+            ui.showLine();
+            if (shouldExit(input)) {
+                return;
+            }
         }
     }
 
@@ -52,47 +57,40 @@ public class Chatty {
         try {
             return new TaskList(storage.loadTasks());
         } catch (ChattyException exception) {
-            ui.showError(exception.getMessage());
+            ui.showResponse(ui.formatError(exception.getMessage()));
             return new TaskList();
         }
     }
 
     /**
-     * Processes one user command and displays Chatty's response.
+     * Processes one user command and returns the response for any user interface.
      *
      * @param rawInput command entered by the user.
-     * @return false if Chatty should exit, and true otherwise.
+     * @return response produced after processing the command.
      */
-    private boolean processCommand(String rawInput) {
+    public String getResponse(String rawInput) {
         String input = rawInput.strip();
-        ui.showLine();
         CommandType command = Parser.parseCommand(input);
         try {
             switch (command) {
                 case BYE:
-                    ui.showExit();
-                    return false;
+                    return ui.formatExit();
                 case LIST:
-                    ui.showTaskList(tasks.getTasks());
-                    break;
+                    return ui.formatTaskList(tasks.getTasks());
                 case FIND:
-                    ui.showMatchingTasks(tasks.find(Parser.parseFindKeyword(input)));
-                    break;
+                    return ui.formatMatchingTasks(tasks.find(Parser.parseFindKeyword(input)));
                 case MARK:
                     Task markedTask = tasks.mark(Parser.parseTaskNumber(input, command));
-                    ui.showTaskMarked(markedTask);
                     storage.saveTasks(tasks.getTasks());
-                    break;
+                    return ui.formatTaskMarked(markedTask);
                 case UNMARK:
                     Task unmarkedTask = tasks.unmark(Parser.parseTaskNumber(input, command));
-                    ui.showTaskUnmarked(unmarkedTask);
                     storage.saveTasks(tasks.getTasks());
-                    break;
+                    return ui.formatTaskUnmarked(unmarkedTask);
                 case DELETE:
                     Task deletedTask = tasks.delete(Parser.parseTaskNumber(input, command));
-                    ui.showTaskDeleted(deletedTask, tasks.size());
                     storage.saveTasks(tasks.getTasks());
-                    break;
+                    return ui.formatTaskDeleted(deletedTask, tasks.size());
                 case TODO:
                     // Fallthrough
                 case DEADLINE:
@@ -100,18 +98,25 @@ public class Chatty {
                 case EVENT:
                     Task addedTask = Parser.parseTask(input, command);
                     tasks.add(addedTask);
-                    ui.showTaskAdded(addedTask, tasks.size());
                     storage.saveTasks(tasks.getTasks());
-                    break;
+                    return ui.formatTaskAdded(addedTask, tasks.size());
                 default:
                     throw new ChattyException("OOPS!!! I don't recognise that command. "
                             + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
             }
         } catch (ChattyException exception) {
-            ui.showError(exception.getMessage());
+            return ui.formatError(exception.getMessage());
         }
-        ui.showLine();
-        return true;
+    }
+
+    /**
+     * Returns whether the supplied input is the command that closes Chatty.
+     *
+     * @param rawInput command entered by the user.
+     * @return {@code true} when the normalized command is {@code bye}.
+     */
+    public boolean shouldExit(String rawInput) {
+        return Parser.parseCommand(rawInput.strip()) == CommandType.BYE;
     }
 
     /**

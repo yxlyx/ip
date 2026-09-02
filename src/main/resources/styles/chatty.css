@@ -1,0 +1,57 @@
+.root {
+    -fx-background-color: #f4f1ea;
+    -fx-font-family: "Arial";
+    -fx-font-size: 14px;
+}
+
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.dialog-text {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-padding: 10px 12px;
+    -fx-text-fill: #27241f;
+}
+
+.user-dialog .dialog-text {
+    -fx-background-color: #dce7dd;
+}
+
+.avatar {
+    -fx-background-color: #3f5945;
+    -fx-background-radius: 20px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.user-dialog .avatar {
+    -fx-background-color: #725d43;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8px;
+    -fx-border-color: #c8c1b5;
+    -fx-border-radius: 8px;
+    -fx-padding: 10px;
+}
+
+.button {
+    -fx-background-color: #3f5945;
+    -fx-background-radius: 8px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 18px;
+    -fx-text-fill: #ffffff;
+}
+
+.button:hover {
+    -fx-background-color: #304536;
+}
+
+.button:disabled {
+    -fx-opacity: 0.5;
+}
