@@ -51,10 +51,7 @@ public class Ui {
 
     /** Displays Chatty's startup banner and greeting. */
     public void showGreeting() {
-        showLine();
-        System.out.println(BANNER);
-        System.out.println(WELCOME);
-        showLine();
+        printLines(HORIZONTAL_LINE, BANNER, WELCOME, HORIZONTAL_LINE);
     }
 
     /** Displays the line that separates responses from user input. */
@@ -118,9 +115,10 @@ public class Ui {
      * @return formatted task-added response.
      */
     public String formatTaskAdded(Task task, int taskCount) {
-        return " Got it. I've added this task:\n"
-                + "   " + task + "\n"
-                + " Now you have " + taskCount + " tasks in the list.";
+        return formatLines(
+                " Got it. I've added this task:",
+                "   " + task,
+                " Now you have " + taskCount + " tasks in the list.");
     }
 
     /**
@@ -130,7 +128,7 @@ public class Ui {
      * @return formatted task-marked response.
      */
     public String formatTaskMarked(Task task) {
-        return " Nice! I've marked this task as done:\n   " + task;
+        return formatLines(" Nice! I've marked this task as done:", "   " + task);
     }
 
     /**
@@ -140,7 +138,7 @@ public class Ui {
      * @return formatted task-unmarked response.
      */
     public String formatTaskUnmarked(Task task) {
-        return " OK, I've marked this task as not done yet:\n   " + task;
+        return formatLines(" OK, I've marked this task as not done yet:", "   " + task);
     }
 
     /**
@@ -151,9 +149,10 @@ public class Ui {
      * @return formatted task-deleted response.
      */
     public String formatTaskDeleted(Task task, int taskCount) {
-        return " Noted. I've removed this task:\n"
-                + "   " + task + "\n"
-                + " Now you have " + taskCount + " tasks in the list.";
+        return formatLines(
+                " Noted. I've removed this task:",
+                "   " + task,
+                " Now you have " + taskCount + " tasks in the list.");
     }
 
     /**
@@ -173,5 +172,24 @@ public class Ui {
                     .append(tasks.get(i));
         }
         return response.toString();
+    }
+
+    /**
+     * Displays each supplied line in order.
+     *
+     * @param lines response lines to display.
+     */
+    private void printLines(String... lines) {
+        System.out.println(formatLines(lines));
+    }
+
+    /**
+     * Joins a variable number of response lines into one response.
+     *
+     * @param lines response lines to join.
+     * @return supplied lines separated by newline characters.
+     */
+    private String formatLines(String... lines) {
+        return String.join("\n", lines);
     }
 }
