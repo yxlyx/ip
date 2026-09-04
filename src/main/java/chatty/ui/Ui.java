@@ -62,86 +62,116 @@ public class Ui {
         System.out.println(HORIZONTAL_LINE);
     }
 
-    /** Displays Chatty's farewell response and its closing separator. */
-    public void showExit() {
-        System.out.println(" Bye. Hope to see you again soon!");
-        showLine();
-    }
-
     /**
-     * Displays an error message to the user.
+     * Displays a response produced by Chatty.
      *
-     * @param message error message to display.
+     * @param response response to display.
      */
-    public void showError(String message) {
-        System.out.println(" " + message);
+    public void showResponse(String response) {
+        System.out.println(response);
     }
 
     /**
-     * Displays every task with its one-based list number.
+     * Returns Chatty's farewell response.
      *
-     * @param tasks tasks to display.
+     * @return farewell response.
      */
-    public void showTaskList(List<Task> tasks) {
-        System.out.println(" Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + tasks.get(i));
-        }
+    public String formatExit() {
+        return " Bye. Hope to see you again soon!";
     }
 
     /**
-     * Displays tasks that match a find keyword.
+     * Formats an error message for display.
      *
-     * @param matchingTasks matching tasks to display.
+     * @param message error message to format.
+     * @return formatted error response.
      */
-    public void showMatchingTasks(List<Task> matchingTasks) {
-        System.out.println(" Here are the matching tasks in your list:");
-        for (int i = 0; i < matchingTasks.size(); i++) {
-            System.out.println(" " + (i + 1) + "." + matchingTasks.get(i));
-        }
+    public String formatError(String message) {
+        return " " + message;
     }
 
     /**
-     * Displays confirmation that a task was added.
+     * Formats every task with its one-based list number.
+     *
+     * @param tasks tasks to format.
+     * @return formatted task-list response.
+     */
+    public String formatTaskList(List<Task> tasks) {
+        return formatTasks(" Here are the tasks in your list:", tasks);
+    }
+
+    /**
+     * Formats tasks that match a find keyword.
+     *
+     * @param matchingTasks matching tasks to format.
+     * @return formatted matching-task response.
+     */
+    public String formatMatchingTasks(List<Task> matchingTasks) {
+        return formatTasks(" Here are the matching tasks in your list:", matchingTasks);
+    }
+
+    /**
+     * Formats confirmation that a task was added.
      *
      * @param task task that was added.
      * @param taskCount number of tasks after the addition.
+     * @return formatted task-added response.
      */
-    public void showTaskAdded(Task task, int taskCount) {
-        System.out.println(" Got it. I've added this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+    public String formatTaskAdded(Task task, int taskCount) {
+        return " Got it. I've added this task:\n"
+                + "   " + task + "\n"
+                + " Now you have " + taskCount + " tasks in the list.";
     }
 
     /**
-     * Displays confirmation that a task was marked as done.
+     * Formats confirmation that a task was marked as done.
      *
      * @param task task that was marked as done.
+     * @return formatted task-marked response.
      */
-    public void showTaskMarked(Task task) {
-        System.out.println(" Nice! I've marked this task as done:");
-        System.out.println("   " + task);
+    public String formatTaskMarked(Task task) {
+        return " Nice! I've marked this task as done:\n   " + task;
     }
 
     /**
-     * Displays confirmation that a task was marked as not done.
+     * Formats confirmation that a task was marked as not done.
      *
      * @param task task that was marked as not done.
+     * @return formatted task-unmarked response.
      */
-    public void showTaskUnmarked(Task task) {
-        System.out.println(" OK, I've marked this task as not done yet:");
-        System.out.println("   " + task);
+    public String formatTaskUnmarked(Task task) {
+        return " OK, I've marked this task as not done yet:\n   " + task;
     }
 
     /**
-     * Displays confirmation that a task was deleted.
+     * Formats confirmation that a task was deleted.
      *
      * @param task task that was deleted.
      * @param taskCount number of tasks after the deletion.
+     * @return formatted task-deleted response.
      */
-    public void showTaskDeleted(Task task, int taskCount) {
-        System.out.println(" Noted. I've removed this task:");
-        System.out.println("   " + task);
-        System.out.println(" Now you have " + taskCount + " tasks in the list.");
+    public String formatTaskDeleted(Task task, int taskCount) {
+        return " Noted. I've removed this task:\n"
+                + "   " + task + "\n"
+                + " Now you have " + taskCount + " tasks in the list.";
+    }
+
+    /**
+     * Formats a task collection below the supplied heading.
+     *
+     * @param heading heading shown above the tasks.
+     * @param tasks tasks to format.
+     * @return formatted task collection.
+     */
+    private String formatTasks(String heading, List<Task> tasks) {
+        StringBuilder response = new StringBuilder(heading);
+        for (int i = 0; i < tasks.size(); i++) {
+            response.append('\n')
+                    .append(' ')
+                    .append(i + 1)
+                    .append('.')
+                    .append(tasks.get(i));
+        }
+        return response.toString();
     }
 }
