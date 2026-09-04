@@ -28,8 +28,8 @@ public class TaskListTest {
 
         assertEquals(1, taskList.size());
         assertSame(originalTask, taskList.getTasks().get(0));
-        assertThrows(UnsupportedOperationException.class,
-                () -> taskList.getTasks().add(new Todo("write notes")));
+        assertThrows(UnsupportedOperationException.class, () ->
+                taskList.getTasks().add(new Todo("write notes")));
     }
 
     /** Verifies that finding a keyword returns matching tasks in their existing order. */
@@ -98,8 +98,8 @@ public class TaskListTest {
     @Test
     public void taskOperations_emptyOrOutOfRangeTaskNumber_exceptionThrown() {
         TaskList emptyTaskList = new TaskList();
-        ChattyException emptyListException = assertThrows(ChattyException.class,
-                () -> emptyTaskList.mark(1));
+        ChattyException emptyListException = assertThrows(ChattyException.class, () ->
+                emptyTaskList.mark(1));
         assertEquals("OOPS!!! Your task list is empty.", emptyListException.getMessage());
 
         TaskList taskList = new TaskList(List.of(new Todo("read book")));

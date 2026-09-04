@@ -87,16 +87,16 @@ public class ParserTest {
     /** Verifies that missing or invalid task details raise {@link ChattyException}. */
     @Test
     public void parseTask_missingOrInvalidDetails_exceptionThrown() {
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTask("todo", CommandType.TODO));
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTask("deadline submit report", CommandType.DEADLINE));
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTask("deadline submit report /by 2026-02-30", CommandType.DEADLINE));
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTask("event meeting /from 2pm", CommandType.EVENT));
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTask("list", CommandType.LIST));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("todo", CommandType.TODO));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("deadline submit report", CommandType.DEADLINE));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("deadline submit report /by 2026-02-30", CommandType.DEADLINE));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("event meeting /from 2pm", CommandType.EVENT));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("list", CommandType.LIST));
     }
 
     /**
@@ -113,11 +113,11 @@ public class ParserTest {
     /** Verifies that missing or non-integer task numbers raise {@link ChattyException}. */
     @Test
     public void parseTaskNumber_missingOrNonIntegerNumber_exceptionThrown() {
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTaskNumber("mark", CommandType.MARK));
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTaskNumber("delete two", CommandType.DELETE));
-        assertThrows(ChattyException.class,
-                () -> Parser.parseTaskNumber("unmark 1.5", CommandType.UNMARK));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTaskNumber("mark", CommandType.MARK));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTaskNumber("delete two", CommandType.DELETE));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTaskNumber("unmark 1.5", CommandType.UNMARK));
     }
 }
