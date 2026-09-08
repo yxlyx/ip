@@ -19,6 +19,8 @@ import org.junit.jupiter.api.io.TempDir;
 import chatty.exception.ChattyException;
 import chatty.task.Deadline;
 import chatty.task.Event;
+import chatty.task.RecurrenceUnit;
+import chatty.task.RecurringTask;
 import chatty.task.Task;
 import chatty.task.Todo;
 
@@ -58,21 +60,26 @@ public class StorageTest {
         Deadline deadline = new Deadline("submit report", LocalDate.of(2026, 10, 15));
         Event event = new Event("project meeting", "2pm", "4pm");
         event.markAsDone();
+        RecurringTask recurringTask = new RecurringTask("team meeting",
+                LocalDate.of(2026, 9, 14), 1, RecurrenceUnit.WEEK);
 
-        storage.saveTasks(List.of(todo, deadline, event));
+        storage.saveTasks(List.of(todo, deadline, event, recurringTask));
 
         assertEquals(List.of(
                 "T | 1 | read book",
                 "D | 0 | submit report | 2026-10-15",
-                "E | 1 | project meeting | 2pm | 4pm"),
+                "E | 1 | project meeting | 2pm | 4pm",
+                "R | 0 | team meeting | 2026-09-14 | 1 | WEEK"),
                 Files.readAllLines(filePath, StandardCharsets.UTF_8));
 
         List<Task> loadedTasks = storage.loadTasks();
         Todo loadedTodo = assertInstanceOf(Todo.class, loadedTasks.get(0));
         Deadline loadedDeadline = assertInstanceOf(Deadline.class, loadedTasks.get(1));
         Event loadedEvent = assertInstanceOf(Event.class, loadedTasks.get(2));
+        RecurringTask loadedRecurringTask =
+                assertInstanceOf(RecurringTask.class, loadedTasks.get(3));
 
-        assertEquals(3, loadedTasks.size());
+        assertEquals(4, loadedTasks.size());
         assertEquals("read book", loadedTodo.getDescription());
         assertTrue(loadedTodo.isDone());
         assertEquals("submit report", loadedDeadline.getDescription());
@@ -82,6 +89,12 @@ public class StorageTest {
         assertEquals("2pm", loadedEvent.getFrom());
         assertEquals("4pm", loadedEvent.getTo());
         assertTrue(loadedEvent.isDone());
+        assertEquals("team meeting", loadedRecurringTask.getDescription());
+        assertEquals(LocalDate.of(2026, 9, 14),
+                loadedRecurringTask.getNextOccurrenceDate());
+        assertEquals(1, loadedRecurringTask.getInterval());
+        assertEquals(RecurrenceUnit.WEEK, loadedRecurringTask.getRecurrenceUnit());
+        assertFalse(loadedRecurringTask.isDone());
     }
 
     /**
@@ -100,6 +113,22 @@ public class StorageTest {
 
         assertEquals(1, loadedTasks.size());
         assertEquals("read book", loadedTasks.get(0).getDescription());
+    }
+
+    /**
+     * Verifies that a completed recurring-task record is rejected.
+     *
+     * @throws IOException if creating the malformed test data file fails unexpectedly.
+     */
+    @Test
+    public void loadTasks_completedRecurringTask_exceptionThrown() throws IOException {
+        Path filePath = tempDirectory.resolve("chatty.txt");
+        Files.writeString(filePath,
+                "R | 1 | team meeting | 2026-09-14 | 1 | WEEK",
+                StandardCharsets.UTF_8);
+        Storage storage = new Storage(filePath);
+
+        assertThrows(ChattyException.class, storage::loadTasks);
     }
 
     /**

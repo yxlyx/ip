@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import chatty.exception.ChattyException;
 import chatty.task.Deadline;
 import chatty.task.Event;
+import chatty.task.RecurrenceUnit;
+import chatty.task.RecurringTask;
 import chatty.task.Task;
 import chatty.task.Todo;
 
@@ -32,6 +34,8 @@ public class ParserTest {
                 Parser.parseCommand("deadline submit report /by 2026-10-15"));
         assertEquals(CommandType.EVENT,
                 Parser.parseCommand("event meeting /from 2pm /to 4pm"));
+        assertEquals(CommandType.RECURRING,
+                Parser.parseCommand("recurring meeting /on 2026-09-14 /every 1 week"));
     }
 
     /** Verifies that unsupported command inputs map to {@link CommandType#UNKNOWN}. */
@@ -82,6 +86,15 @@ public class ParserTest {
         assertEquals("project meeting", event.getDescription());
         assertEquals("2pm", event.getFrom());
         assertEquals("4pm", event.getTo());
+
+        Task parsedRecurringTask = Parser.parseTask(
+                "recurring project meeting /on 2026-09-14 /every 1 week",
+                CommandType.RECURRING);
+        RecurringTask recurringTask = assertInstanceOf(RecurringTask.class, parsedRecurringTask);
+        assertEquals("project meeting", recurringTask.getDescription());
+        assertEquals(LocalDate.of(2026, 9, 14), recurringTask.getNextOccurrenceDate());
+        assertEquals(1, recurringTask.getInterval());
+        assertEquals(RecurrenceUnit.WEEK, recurringTask.getRecurrenceUnit());
     }
 
     /** Verifies that missing or invalid task details raise {@link ChattyException}. */
@@ -95,6 +108,14 @@ public class ParserTest {
                 Parser.parseTask("deadline submit report /by 2026-02-30", CommandType.DEADLINE));
         assertThrows(ChattyException.class, () ->
                 Parser.parseTask("event meeting /from 2pm", CommandType.EVENT));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("recurring meeting /on 2026-09-14", CommandType.RECURRING));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "recurring meeting /on 2026-02-30 /every 1 week", CommandType.RECURRING));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "recurring meeting /on 2026-09-14 /every 0 weeks", CommandType.RECURRING));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "recurring meeting /on 2026-09-14 /every 1 fortnight", CommandType.RECURRING));
         assertThrows(ChattyException.class, () ->
                 Parser.parseTask("list", CommandType.LIST));
     }

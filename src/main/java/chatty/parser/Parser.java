@@ -6,6 +6,8 @@ import java.time.format.DateTimeParseException;
 import chatty.exception.ChattyException;
 import chatty.task.Deadline;
 import chatty.task.Event;
+import chatty.task.RecurrenceUnit;
+import chatty.task.RecurringTask;
 import chatty.task.Task;
 import chatty.task.Todo;
 
@@ -21,6 +23,12 @@ public class Parser {
 
     /** Delimiter separating an event start value from its end value. */
     private static final String EVENT_TO_DELIMITER = "/to";
+
+    /** Delimiter separating a recurring-task description from its next date. */
+    private static final String RECURRING_ON_DELIMITER = "/on";
+
+    /** Delimiter separating a recurring-task date from its interval. */
+    private static final String RECURRING_EVERY_DELIMITER = "/every";
 
     /** Prevents instantiation of this command-parsing utility class. */
     private Parser() {
@@ -60,6 +68,8 @@ public class Parser {
                 return parseDeadline(input);
             case EVENT:
                 return parseEvent(input);
+            case RECURRING:
+                return parseRecurringTask(input);
             default:
                 throw new ChattyException("OOPS!!! That command does not create a task.");
         }
@@ -182,6 +192,88 @@ public class Parser {
                     + EVENT_TO_DELIMITER + "'.");
         }
         return new Event(description, from, to);
+    }
+
+    /**
+     * Creates a recurring task from its next date and recurrence interval.
+     * The first {@code /on} and first subsequent {@code /every} are treated as delimiters.
+     *
+     * @param input normalized recurring-task command.
+     * @return parsed recurring task.
+     * @throws ChattyException if the recurring-task details are missing or invalid.
+     */
+    private static RecurringTask parseRecurringTask(String input) throws ChattyException {
+        String details = input.substring(CommandType.RECURRING.getKeyword().length()).strip();
+        int onIndex = details.indexOf(RECURRING_ON_DELIMITER);
+        if (onIndex < 0) {
+            throw new ChattyException("OOPS!!! A recurring task needs '"
+                    + RECURRING_ON_DELIMITER + "' and '" + RECURRING_EVERY_DELIMITER + "'. "
+                    + "Try: recurring DESCRIPTION " + RECURRING_ON_DELIMITER
+                    + " YYYY-MM-DD " + RECURRING_EVERY_DELIMITER + " NUMBER UNIT");
+        }
+
+        int everyIndex = details.indexOf(RECURRING_EVERY_DELIMITER,
+                onIndex + RECURRING_ON_DELIMITER.length());
+        if (everyIndex < 0) {
+            throw new ChattyException("OOPS!!! A recurring task with '"
+                    + RECURRING_ON_DELIMITER + "' also needs an interval after '"
+                    + RECURRING_EVERY_DELIMITER + "'.");
+        }
+
+        String description = details.substring(0, onIndex).strip();
+        String dateText = details.substring(
+                onIndex + RECURRING_ON_DELIMITER.length(), everyIndex).strip();
+        String recurrenceText = details.substring(
+                everyIndex + RECURRING_EVERY_DELIMITER.length()).strip();
+        requireDescription(description, "recurring task");
+        if (dateText.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me the next occurrence date after '"
+                    + RECURRING_ON_DELIMITER + "'.");
+        } else if (recurrenceText.isEmpty()) {
+            throw new ChattyException("OOPS!!! Tell me the recurrence interval after '"
+                    + RECURRING_EVERY_DELIMITER + "'.");
+        }
+
+        LocalDate nextOccurrenceDate;
+        try {
+            nextOccurrenceDate = LocalDate.parse(dateText);
+        } catch (DateTimeParseException exception) {
+            throw new ChattyException("OOPS!!! Use YYYY-MM-DD for recurring-task dates, "
+                    + "such as 2026-09-14.");
+        }
+
+        String[] recurrenceParts = recurrenceText.split("\\s+");
+        if (recurrenceParts.length != 2) {
+            throw invalidRecurrenceInterval();
+        }
+
+        int interval;
+        try {
+            interval = Integer.parseInt(recurrenceParts[0]);
+        } catch (NumberFormatException exception) {
+            throw invalidRecurrenceInterval();
+        }
+        if (interval <= 0) {
+            throw invalidRecurrenceInterval();
+        }
+
+        RecurrenceUnit recurrenceUnit;
+        try {
+            recurrenceUnit = RecurrenceUnit.fromInput(recurrenceParts[1]);
+        } catch (IllegalArgumentException exception) {
+            throw invalidRecurrenceInterval();
+        }
+        return new RecurringTask(description, nextOccurrenceDate, interval, recurrenceUnit);
+    }
+
+    /**
+     * Returns the standard error for an invalid recurrence interval.
+     *
+     * @return exception describing the accepted interval syntax.
+     */
+    private static ChattyException invalidRecurrenceInterval() {
+        return new ChattyException("OOPS!!! Use a positive whole number followed by day, week, "
+                + "month, or year after '" + RECURRING_EVERY_DELIMITER + "'.");
     }
 
     /**

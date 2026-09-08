@@ -12,6 +12,8 @@ import java.util.List;
 import chatty.exception.ChattyException;
 import chatty.task.Deadline;
 import chatty.task.Event;
+import chatty.task.RecurrenceUnit;
+import chatty.task.RecurringTask;
 import chatty.task.Task;
 import chatty.task.Todo;
 
@@ -136,6 +138,10 @@ public class Storage {
                 }
                 task = new Event(fields[2], fields[3], fields[4]);
                 break;
+            case "R":
+                requireFields(fields, 6, lineNumber);
+                task = parseRecurringTask(fields, isDone, lineNumber);
+                break;
             default:
                 throw invalidRecord(lineNumber);
         }
@@ -144,6 +150,47 @@ public class Storage {
             task.markAsDone();
         }
         return task;
+    }
+
+    /**
+     * Restores a recurring task from its validated storage fields.
+     *
+     * @param fields recurring-task storage fields.
+     * @param isDone stored completion status.
+     * @param lineNumber one-based line number of the record.
+     * @return recurring task restored from the record.
+     * @throws ChattyException if the recurring-task fields are invalid.
+     */
+    private Task parseRecurringTask(String[] fields, boolean isDone, int lineNumber)
+            throws ChattyException {
+        if (isDone || fields[3].isBlank() || fields[4].isBlank() || fields[5].isBlank()) {
+            throw invalidRecord(lineNumber);
+        }
+
+        LocalDate nextOccurrenceDate;
+        try {
+            nextOccurrenceDate = LocalDate.parse(fields[3]);
+        } catch (DateTimeParseException exception) {
+            throw invalidRecord(lineNumber);
+        }
+
+        int interval;
+        try {
+            interval = Integer.parseInt(fields[4]);
+        } catch (NumberFormatException exception) {
+            throw invalidRecord(lineNumber);
+        }
+        if (interval <= 0) {
+            throw invalidRecord(lineNumber);
+        }
+
+        RecurrenceUnit recurrenceUnit;
+        try {
+            recurrenceUnit = RecurrenceUnit.valueOf(fields[5]);
+        } catch (IllegalArgumentException exception) {
+            throw invalidRecord(lineNumber);
+        }
+        return new RecurringTask(fields[2], nextOccurrenceDate, interval, recurrenceUnit);
     }
 
     /**
@@ -185,6 +232,10 @@ public class Storage {
         } else if (task instanceof Event event) {
             return record + FIELD_SEPARATOR + event.getFrom()
                     + FIELD_SEPARATOR + event.getTo();
+        } else if (task instanceof RecurringTask recurringTask) {
+            return record + FIELD_SEPARATOR + recurringTask.getNextOccurrenceDate()
+                    + FIELD_SEPARATOR + recurringTask.getInterval()
+                    + FIELD_SEPARATOR + recurringTask.getRecurrenceUnit();
         }
         assert task instanceof Todo : "Only todo tasks can use the base storage format";
         return record;

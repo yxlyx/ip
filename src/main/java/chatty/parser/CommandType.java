@@ -31,6 +31,9 @@ public enum CommandType {
     /** Adds an event. */
     EVENT("event", true),
 
+    /** Adds a recurring task. */
+    RECURRING("recurring", true),
+
     /** Represents input that does not match a supported command. */
     UNKNOWN("", false);
 

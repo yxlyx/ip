@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +76,40 @@ public class TaskListTest {
 
         assertSame(secondTask, unmarkedTask);
         assertFalse(secondTask.isDone());
+    }
+
+    /**
+     * Verifies that marking a recurring task advances it and that unmarking is rejected.
+     *
+     * @throws ChattyException if a valid recurring task cannot be marked.
+     */
+    @Test
+    public void markAndUnmark_overdueRecurringTask_oneIntervalAdvancedAndUnmarkRejected()
+            throws ChattyException {
+        RecurringTask recurringTask = new RecurringTask("project meeting",
+                LocalDate.of(2026, 8, 1), 1, RecurrenceUnit.WEEK);
+        TaskList taskList = new TaskList(List.of(recurringTask));
+
+        Task markedTask = taskList.mark(1);
+
+        assertSame(recurringTask, markedTask);
+        assertEquals(LocalDate.of(2026, 8, 8), recurringTask.getNextOccurrenceDate());
+        assertFalse(recurringTask.isDone());
+        assertThrows(ChattyException.class, () -> taskList.unmark(1));
+    }
+
+    /** Verifies that a recurring schedule beyond the supported date range fails safely. */
+    @Test
+    public void mark_recurringTaskAtMaximumDate_exceptionThrownWithoutChangingDate() {
+        RecurringTask recurringTask = new RecurringTask("far-future task",
+                LocalDate.MAX, 1, RecurrenceUnit.DAY);
+        TaskList taskList = new TaskList(List.of(recurringTask));
+
+        ChattyException exception = assertThrows(ChattyException.class, () -> taskList.mark(1));
+
+        assertEquals("OOPS!!! This recurring task cannot advance beyond the supported date range.",
+                exception.getMessage());
+        assertEquals(LocalDate.MAX, recurringTask.getNextOccurrenceDate());
     }
 
     /**

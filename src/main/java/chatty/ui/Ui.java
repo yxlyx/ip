@@ -3,6 +3,7 @@ package chatty.ui;
 import java.util.List;
 import java.util.Scanner;
 
+import chatty.task.RecurringTask;
 import chatty.task.Task;
 
 /**
@@ -129,6 +130,18 @@ public class Ui {
      */
     public String formatTaskMarked(Task task) {
         return formatLines(" Nice! I've marked this task as done:", "   " + task);
+    }
+
+    /**
+     * Formats confirmation that a recurring occurrence was completed and advanced.
+     *
+     * @param task recurring task after its schedule was advanced.
+     * @return formatted recurring-task response.
+     */
+    public String formatRecurringTaskAdvanced(RecurringTask task) {
+        return formatLines(
+                " Nice! I've completed this occurrence. The next one is:",
+                "   " + task);
     }
 
     /**

@@ -6,6 +6,7 @@ import chatty.exception.ChattyException;
 import chatty.parser.CommandType;
 import chatty.parser.Parser;
 import chatty.storage.Storage;
+import chatty.task.RecurringTask;
 import chatty.task.Task;
 import chatty.task.TaskList;
 import chatty.ui.Ui;
@@ -105,10 +106,13 @@ public class Chatty {
             case DEADLINE:
                 // Fallthrough
             case EVENT:
+                // Fallthrough
+            case RECURRING:
                 return addTask(input, command);
             default:
                 throw new ChattyException("OOPS!!! I don't recognise that command. "
-                        + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
+                        + "Try todo, deadline, event, recurring, list, find, mark, unmark, "
+                        + "delete, or bye.");
         }
     }
 
@@ -122,6 +126,9 @@ public class Chatty {
     private String markTask(String input) throws ChattyException {
         Task markedTask = tasks.mark(Parser.parseTaskNumber(input, CommandType.MARK));
         saveTasks();
+        if (markedTask instanceof RecurringTask recurringTask) {
+            return ui.formatRecurringTaskAdvanced(recurringTask);
+        }
         return ui.formatTaskMarked(markedTask);
     }
 
