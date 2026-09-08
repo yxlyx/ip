@@ -123,6 +123,9 @@ public class TaskList {
             throw new ChattyException("OOPS!!! Task " + taskNumber + " does not exist. "
                     + "Choose a number from 1 to " + tasks.size() + ".");
         }
-        return tasks.get(taskNumber - 1);
+        int taskIndex = taskNumber - 1;
+        assert taskIndex >= 0 && taskIndex < tasks.size()
+                : "Validated task number must map to an existing task";
+        return tasks.get(taskIndex);
     }
 }
