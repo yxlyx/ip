@@ -186,6 +186,7 @@ public class Storage {
             return record + FIELD_SEPARATOR + event.getFrom()
                     + FIELD_SEPARATOR + event.getTo();
         }
+        assert task instanceof Todo : "Only todo tasks can use the base storage format";
         return record;
     }
 }
