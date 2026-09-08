@@ -22,6 +22,12 @@ public class Storage {
     /** Separator placed between fields in each saved task record. */
     private static final String FIELD_SEPARATOR = " | ";
 
+    /** Stored status representing a completed task. */
+    private static final String DONE_STATUS = "1";
+
+    /** Stored status representing an incomplete task. */
+    private static final String NOT_DONE_STATUS = "0";
+
     /** Relative path of the file used to store tasks. */
     private final Path filePath;
 
@@ -98,9 +104,9 @@ public class Storage {
         }
 
         boolean isDone;
-        if (fields[1].equals("1")) {
+        if (fields[1].equals(DONE_STATUS)) {
             isDone = true;
-        } else if (fields[1].equals("0")) {
+        } else if (fields[1].equals(NOT_DONE_STATUS)) {
             isDone = false;
         } else {
             throw invalidRecord(lineNumber);
@@ -171,11 +177,11 @@ public class Storage {
      * @return delimited record representing the task.
      */
     private String formatTask(Task task) {
-        String status = task.isDone() ? "1" : "0";
+        String status = task.isDone() ? DONE_STATUS : NOT_DONE_STATUS;
         String record = task.getTypeIcon() + FIELD_SEPARATOR
                 + status + FIELD_SEPARATOR + task.getDescription();
         if (task instanceof Deadline deadline) {
-            return record + FIELD_SEPARATOR + deadline.getBy();
+            return record + FIELD_SEPARATOR + deadline.getDueDate();
         } else if (task instanceof Event event) {
             return record + FIELD_SEPARATOR + event.getFrom()
                     + FIELD_SEPARATOR + event.getTo();

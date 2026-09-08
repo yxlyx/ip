@@ -13,6 +13,15 @@ import chatty.task.Todo;
  * Interprets user input as commands, tasks, and task numbers.
  */
 public class Parser {
+    /** Delimiter separating a deadline description from its due date. */
+    private static final String DEADLINE_BY_DELIMITER = "/by";
+
+    /** Delimiter separating an event description from its start value. */
+    private static final String EVENT_FROM_DELIMITER = "/from";
+
+    /** Delimiter separating an event start value from its end value. */
+    private static final String EVENT_TO_DELIMITER = "/to";
+
     /** Prevents instantiation of this command-parsing utility class. */
     private Parser() {
     }
@@ -114,17 +123,18 @@ public class Parser {
      */
     private static Deadline parseDeadline(String input) throws ChattyException {
         String details = input.substring("deadline".length()).strip();
-        int byIndex = details.indexOf("/by");
+        int byIndex = details.indexOf(DEADLINE_BY_DELIMITER);
         if (byIndex < 0) {
-            throw new ChattyException("OOPS!!! A deadline needs '/by'. "
-                    + "Try: deadline DESCRIPTION /by DATE_OR_TIME");
+            throw new ChattyException("OOPS!!! A deadline needs '" + DEADLINE_BY_DELIMITER + "'. "
+                    + "Try: deadline DESCRIPTION " + DEADLINE_BY_DELIMITER + " DATE_OR_TIME");
         }
 
         String description = details.substring(0, byIndex).strip();
-        String byText = details.substring(byIndex + "/by".length()).strip();
+        String byText = details.substring(byIndex + DEADLINE_BY_DELIMITER.length()).strip();
         requireDescription(description, "deadline");
         if (byText.isEmpty()) {
-            throw new ChattyException("OOPS!!! Tell me when the deadline is due after '/by'.");
+            throw new ChattyException("OOPS!!! Tell me when the deadline is due after '"
+                    + DEADLINE_BY_DELIMITER + "'.");
         }
 
         try {
@@ -136,6 +146,8 @@ public class Parser {
 
     /**
      * Creates an event from its description and time range.
+     * The first {@code /from} and the first subsequent {@code /to} are treated as delimiters.
+     * Delimiter tokens are therefore not supported as literal text in an event description.
      *
      * @param input normalized event command.
      * @return parsed event.
@@ -143,25 +155,31 @@ public class Parser {
      */
     private static Event parseEvent(String input) throws ChattyException {
         String details = input.substring("event".length()).strip();
-        int fromIndex = details.indexOf("/from");
+        int fromIndex = details.indexOf(EVENT_FROM_DELIMITER);
         if (fromIndex < 0) {
-            throw new ChattyException("OOPS!!! An event needs '/from' and '/to'. "
-                    + "Try: event DESCRIPTION /from START /to END");
+            throw new ChattyException("OOPS!!! An event needs '" + EVENT_FROM_DELIMITER
+                    + "' and '" + EVENT_TO_DELIMITER + "'. "
+                    + "Try: event DESCRIPTION " + EVENT_FROM_DELIMITER + " START "
+                    + EVENT_TO_DELIMITER + " END");
         }
 
-        int toIndex = details.indexOf("/to", fromIndex + "/from".length());
+        int toIndex = details.indexOf(EVENT_TO_DELIMITER,
+                fromIndex + EVENT_FROM_DELIMITER.length());
         if (toIndex < 0) {
-            throw new ChattyException("OOPS!!! An event with '/from' also needs an ending value after '/to'.");
+            throw new ChattyException("OOPS!!! An event with '" + EVENT_FROM_DELIMITER
+                    + "' also needs an ending value after '" + EVENT_TO_DELIMITER + "'.");
         }
 
         String description = details.substring(0, fromIndex).strip();
-        String from = details.substring(fromIndex + "/from".length(), toIndex).strip();
-        String to = details.substring(toIndex + "/to".length()).strip();
+        String from = details.substring(fromIndex + EVENT_FROM_DELIMITER.length(), toIndex).strip();
+        String to = details.substring(toIndex + EVENT_TO_DELIMITER.length()).strip();
         requireDescription(description, "event");
         if (from.isEmpty()) {
-            throw new ChattyException("OOPS!!! Tell me when the event starts after '/from'.");
+            throw new ChattyException("OOPS!!! Tell me when the event starts after '"
+                    + EVENT_FROM_DELIMITER + "'.");
         } else if (to.isEmpty()) {
-            throw new ChattyException("OOPS!!! Tell me when the event ends after '/to'.");
+            throw new ChattyException("OOPS!!! Tell me when the event ends after '"
+                    + EVENT_TO_DELIMITER + "'.");
         }
         return new Event(description, from, to);
     }

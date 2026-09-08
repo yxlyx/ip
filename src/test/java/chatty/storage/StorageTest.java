@@ -76,7 +76,7 @@ public class StorageTest {
         assertEquals("read book", loadedTodo.getDescription());
         assertTrue(loadedTodo.isDone());
         assertEquals("submit report", loadedDeadline.getDescription());
-        assertEquals(LocalDate.of(2026, 10, 15), loadedDeadline.getBy());
+        assertEquals(LocalDate.of(2026, 10, 15), loadedDeadline.getDueDate());
         assertFalse(loadedDeadline.isDone());
         assertEquals("project meeting", loadedEvent.getDescription());
         assertEquals("2pm", loadedEvent.getFrom());

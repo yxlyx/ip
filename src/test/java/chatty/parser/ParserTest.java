@@ -74,7 +74,7 @@ public class ParserTest {
                 "deadline submit report /by 2026-10-15", CommandType.DEADLINE);
         Deadline deadline = assertInstanceOf(Deadline.class, parsedDeadline);
         assertEquals("submit report", deadline.getDescription());
-        assertEquals(LocalDate.of(2026, 10, 15), deadline.getBy());
+        assertEquals(LocalDate.of(2026, 10, 15), deadline.getDueDate());
 
         Task parsedEvent = Parser.parseTask(
                 "event project meeting /from 2pm /to 4pm", CommandType.EVENT);
