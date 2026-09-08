@@ -72,41 +72,107 @@ public class Chatty {
         String input = rawInput.strip();
         CommandType command = Parser.parseCommand(input);
         try {
-            switch (command) {
-                case BYE:
-                    return ui.formatExit();
-                case LIST:
-                    return ui.formatTaskList(tasks.getTasks());
-                case FIND:
-                    return ui.formatMatchingTasks(tasks.find(Parser.parseFindKeyword(input)));
-                case MARK:
-                    Task markedTask = tasks.mark(Parser.parseTaskNumber(input, command));
-                    storage.saveTasks(tasks.getTasks());
-                    return ui.formatTaskMarked(markedTask);
-                case UNMARK:
-                    Task unmarkedTask = tasks.unmark(Parser.parseTaskNumber(input, command));
-                    storage.saveTasks(tasks.getTasks());
-                    return ui.formatTaskUnmarked(unmarkedTask);
-                case DELETE:
-                    Task deletedTask = tasks.delete(Parser.parseTaskNumber(input, command));
-                    storage.saveTasks(tasks.getTasks());
-                    return ui.formatTaskDeleted(deletedTask, tasks.size());
-                case TODO:
-                    // Fallthrough
-                case DEADLINE:
-                    // Fallthrough
-                case EVENT:
-                    Task addedTask = Parser.parseTask(input, command);
-                    tasks.add(addedTask);
-                    storage.saveTasks(tasks.getTasks());
-                    return ui.formatTaskAdded(addedTask, tasks.size());
-                default:
-                    throw new ChattyException("OOPS!!! I don't recognise that command. "
-                            + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
-            }
+            return processCommand(input, command);
         } catch (ChattyException exception) {
             return ui.formatError(exception.getMessage());
         }
+    }
+
+    /**
+     * Executes a parsed command and returns its formatted response.
+     *
+     * @param input normalized user input.
+     * @param command command represented by the input.
+     * @return formatted response produced by the command.
+     * @throws ChattyException if the command arguments or storage operation are invalid.
+     */
+    private String processCommand(String input, CommandType command) throws ChattyException {
+        switch (command) {
+            case BYE:
+                return ui.formatExit();
+            case LIST:
+                return ui.formatTaskList(tasks.getTasks());
+            case FIND:
+                return ui.formatMatchingTasks(tasks.find(Parser.parseFindKeyword(input)));
+            case MARK:
+                return markTask(input);
+            case UNMARK:
+                return unmarkTask(input);
+            case DELETE:
+                return deleteTask(input);
+            case TODO:
+                // Fallthrough
+            case DEADLINE:
+                // Fallthrough
+            case EVENT:
+                return addTask(input, command);
+            default:
+                throw new ChattyException("OOPS!!! I don't recognise that command. "
+                        + "Try todo, deadline, event, list, find, mark, unmark, delete, or bye.");
+        }
+    }
+
+    /**
+     * Marks the selected task as done, saves the task list, and formats the response.
+     *
+     * @param input normalized mark command.
+     * @return formatted task-marked response.
+     * @throws ChattyException if the task number or storage operation is invalid.
+     */
+    private String markTask(String input) throws ChattyException {
+        Task markedTask = tasks.mark(Parser.parseTaskNumber(input, CommandType.MARK));
+        saveTasks();
+        return ui.formatTaskMarked(markedTask);
+    }
+
+    /**
+     * Marks the selected task as not done, saves the task list, and formats the response.
+     *
+     * @param input normalized unmark command.
+     * @return formatted task-unmarked response.
+     * @throws ChattyException if the task number or storage operation is invalid.
+     */
+    private String unmarkTask(String input) throws ChattyException {
+        Task unmarkedTask = tasks.unmark(Parser.parseTaskNumber(input, CommandType.UNMARK));
+        saveTasks();
+        return ui.formatTaskUnmarked(unmarkedTask);
+    }
+
+    /**
+     * Deletes the selected task, saves the task list, and formats the response.
+     *
+     * @param input normalized delete command.
+     * @return formatted task-deleted response.
+     * @throws ChattyException if the task number or storage operation is invalid.
+     */
+    private String deleteTask(String input) throws ChattyException {
+        Task deletedTask = tasks.delete(Parser.parseTaskNumber(input, CommandType.DELETE));
+        saveTasks();
+        return ui.formatTaskDeleted(deletedTask, tasks.size());
+    }
+
+    /**
+     * Adds a parsed task, saves the task list, and formats the response.
+     *
+     * @param input normalized add command.
+     * @param command type of task to add.
+     * @return formatted task-added response.
+     * @throws ChattyException if the task details or storage operation are invalid.
+     */
+    private String addTask(String input, CommandType command) throws ChattyException {
+        Task addedTask = Parser.parseTask(input, command);
+        tasks.add(addedTask);
+        saveTasks();
+        return ui.formatTaskAdded(addedTask, tasks.size());
+    }
+
+    /**
+     * Saves the current task list.
+     *
+     * @throws ChattyException if the task list cannot be saved.
+     */
+    private void saveTasks() throws ChattyException {
+        storage.saveTasks(tasks.getTasks());
     }
 
     /**
