@@ -1,5 +1,6 @@
 package chatty.task;
 
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -68,15 +69,24 @@ public class TaskList {
     }
 
     /**
-     * Marks the selected task as done and returns it for display.
+     * Completes the selected task or advances a recurring task to its next occurrence.
      *
      * @param taskNumber one-based number of the task to mark.
-     * @return task that was marked.
-     * @throws ChattyException if the task number is invalid.
+     * @return task that was completed or advanced.
+     * @throws ChattyException if the task number is invalid or a schedule cannot advance.
      */
     public Task mark(int taskNumber) throws ChattyException {
         Task task = getTask(taskNumber);
-        task.markAsDone();
+        if (task instanceof RecurringTask recurringTask) {
+            try {
+                recurringTask.advanceToNextOccurrence();
+            } catch (DateTimeException | ArithmeticException exception) {
+                throw new ChattyException("OOPS!!! This recurring task cannot advance beyond "
+                        + "the supported date range.");
+            }
+        } else {
+            task.markAsDone();
+        }
         return task;
     }
 
@@ -89,6 +99,10 @@ public class TaskList {
      */
     public Task unmark(int taskNumber) throws ChattyException {
         Task task = getTask(taskNumber);
+        if (task instanceof RecurringTask) {
+            throw new ChattyException("OOPS!!! A recurring task always represents its next "
+                    + "pending occurrence, so it cannot be unmarked.");
+        }
         task.markAsNotDone();
         return task;
     }

@@ -42,11 +42,30 @@ Got it. I've added this task:
 Now you have 3 tasks in the list.
 ```
 
+## Adding a recurring task
+
+Enter `recurring DESCRIPTION /on YYYY-MM-DD /every NUMBER UNIT` to add a task
+that repeats on a calendar schedule. `NUMBER` must be a positive whole number,
+and `UNIT` can be `day`, `week`, `month`, or `year`, in singular or plural form.
+
+Example: `recurring project meeting /on 2026-09-14 /every 1 week`
+
+```text
+Got it. I've added this task:
+  [R][ ] project meeting (on: Sep 14 2026, every: 1 week)
+Now you have 4 tasks in the list.
+```
+
+A recurring task represents its next pending occurrence. Marking it completes
+that occurrence and advances the displayed date by one interval. Month and year
+intervals use calendar arithmetic, so a date near the end of a month can be
+adjusted to the last valid day of the resulting month.
+
 ## Listing tasks
 
 Enter `list` to display every task with its number, type, and status:
 
-- `[T]` identifies a todo, `[D]` a deadline, and `[E]` an event.
+- `[T]` identifies a todo, `[D]` a deadline, `[E]` an event, and `[R]` a recurring task.
 - `[ ]` means a task is not done, while `[X]` means it is done.
 
 ```text
@@ -80,6 +99,14 @@ Nice! I've marked this task as done:
   [D][X] return book (by: Sunday)
 ```
 
+For a recurring task, `mark INDEX` completes the current occurrence and advances
+exactly one interval. It does not skip overdue occurrences automatically.
+
+```text
+Nice! I've completed this occurrence. The next one is:
+  [R][ ] project meeting (on: Sep 21 2026, every: 1 week)
+```
+
 ## Marking a task as not done
 
 Enter `unmark INDEX` to change a completed task back to not done.
@@ -90,6 +117,9 @@ Example: `unmark 2`
 OK, I've marked this task as not done yet:
   [D][ ] return book (by: Sunday)
 ```
+
+Recurring tasks cannot be unmarked because Chatty keeps only their next pending
+occurrence rather than a history of completed occurrences.
 
 ## Deleting a task
 
@@ -115,9 +145,10 @@ OOPS!!! The description of a todo cannot be empty.
 ```
 
 Task numbers used with `mark`, `unmark`, and `delete` must be whole numbers
-that appear in the current list. Deadline and event commands must include all documented
-delimiters and values. Deadline dates must use `YYYY-MM-DD` and must represent
-valid calendar dates.
+that appear in the current list. Deadline, event, and recurring-task commands
+must include all documented delimiters and values. Deadline and recurring-task
+dates must use `YYYY-MM-DD` and must represent valid calendar dates. Recurrence
+intervals must contain a positive whole number and a supported unit.
 
 ## Exiting Chatty
 
