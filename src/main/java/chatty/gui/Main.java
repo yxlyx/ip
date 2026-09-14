@@ -31,8 +31,8 @@ public class Main extends Application {
         mainWindow.setChatty(new Chatty(DATA_FILE_PATH));
 
         stage.setTitle("Chatty");
-        stage.setMinWidth(420);
-        stage.setMinHeight(560);
+        stage.setMinWidth(380);
+        stage.setMinHeight(480);
         stage.setScene(new Scene(root));
         stage.show();
     }

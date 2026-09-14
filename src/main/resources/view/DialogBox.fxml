@@ -4,14 +4,14 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 
-<fx:root alignment="TOP_LEFT" maxWidth="1.7976931348623157E308" spacing="10.0"
-         styleClass="dialog-box" type="javafx.scene.layout.HBox"
+<fx:root alignment="TOP_LEFT" fillHeight="false" maxWidth="1.7976931348623157E308"
+         spacing="8.0" styleClass="dialog-box" type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/17"
          xmlns:fx="http://javafx.com/fxml/1">
     <children>
-        <Label fx:id="avatar" alignment="CENTER" minHeight="40.0" minWidth="40.0"
-               prefHeight="40.0" prefWidth="40.0" styleClass="avatar" />
-        <Label fx:id="dialog" maxWidth="320.0" minHeight="-Infinity"
+        <Label fx:id="avatar" alignment="CENTER" minHeight="28.0" minWidth="28.0"
+               prefHeight="28.0" prefWidth="28.0" styleClass="avatar" />
+        <Label fx:id="dialog" minHeight="-Infinity" minWidth="80.0"
                styleClass="dialog-text" text="Message" wrapText="true" />
     </children>
     <padding>

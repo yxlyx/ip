@@ -61,9 +61,12 @@ public class MainWindow extends AnchorPane {
         }
 
         String response = chatty.getResponse(input);
+        DialogBox responseDialog = response.stripLeading().startsWith("OOPS!!!")
+                ? DialogBox.createErrorDialog(response)
+                : DialogBox.createChattyDialog(response);
         dialogContainer.getChildren().addAll(
                 DialogBox.createUserDialog(input),
-                DialogBox.createChattyDialog(response));
+                responseDialog);
         userInput.clear();
 
         if (chatty.shouldExit(input)) {
