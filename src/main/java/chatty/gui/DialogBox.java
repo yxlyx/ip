@@ -61,7 +61,7 @@ public class DialogBox extends HBox {
      * @return Chatty dialog containing the response.
      */
     public static DialogBox createChattyDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "C");
+        DialogBox dialogBox = new DialogBox(text, "O");
         dialogBox.getStyleClass().add("chatty-dialog");
         return dialogBox;
     }
