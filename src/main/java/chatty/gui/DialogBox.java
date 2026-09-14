@@ -2,6 +2,7 @@ package chatty.gui;
 
 import java.io.IOException;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -34,7 +35,8 @@ public class DialogBox extends HBox {
             throw new IllegalStateException("Unable to load the dialog-box view.", exception);
         }
 
-        dialog.setText(text);
+        dialog.setText(text.stripLeading());
+        dialog.maxWidthProperty().bind(Bindings.max(180, widthProperty().multiply(0.82)));
         avatar.setText(avatarText);
     }
 
@@ -45,7 +47,7 @@ public class DialogBox extends HBox {
      * @return user dialog containing the message.
      */
     public static DialogBox createUserDialog(String text) {
-        DialogBox dialogBox = new DialogBox(text, "You");
+        DialogBox dialogBox = new DialogBox(text, "ME");
         dialogBox.setAlignment(Pos.TOP_RIGHT);
         dialogBox.getChildren().setAll(dialogBox.dialog, dialogBox.avatar);
         dialogBox.getStyleClass().add("user-dialog");
@@ -61,6 +63,18 @@ public class DialogBox extends HBox {
     public static DialogBox createChattyDialog(String text) {
         DialogBox dialogBox = new DialogBox(text, "C");
         dialogBox.getStyleClass().add("chatty-dialog");
+        return dialogBox;
+    }
+
+    /**
+     * Creates a left-aligned, highlighted dialog for an error response.
+     *
+     * @param text error response from Chatty.
+     * @return error dialog containing the response.
+     */
+    public static DialogBox createErrorDialog(String text) {
+        DialogBox dialogBox = new DialogBox(text, "!");
+        dialogBox.getStyleClass().addAll("chatty-dialog", "error-dialog");
         return dialogBox;
     }
 }

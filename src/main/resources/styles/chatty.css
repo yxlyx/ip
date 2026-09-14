@@ -1,5 +1,5 @@
 .root {
-    -fx-background-color: #f4f1ea;
+    -fx-background-color: #f5f7fb;
     -fx-font-family: "Arial";
     -fx-font-size: 14px;
 }
@@ -9,49 +9,86 @@
     -fx-background-color: transparent;
 }
 
+.scroll-pane {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.dialog-box {
+    -fx-padding: 2px 0;
+}
+
 .dialog-text {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 12px;
+    -fx-background-radius: 4px 14px 14px 14px;
+    -fx-effect: dropshadow(gaussian, rgba(32, 48, 72, 0.10), 8, 0.1, 0, 2);
     -fx-padding: 10px 12px;
-    -fx-text-fill: #27241f;
+    -fx-text-fill: #253047;
 }
 
 .user-dialog .dialog-text {
-    -fx-background-color: #dce7dd;
+    -fx-background-color: #365caa;
+    -fx-background-radius: 14px 4px 14px 14px;
+    -fx-text-fill: #ffffff;
+}
+
+.error-dialog .dialog-text {
+    -fx-background-color: #fff0f0;
+    -fx-border-color: #d95858;
+    -fx-border-radius: 4px 14px 14px 14px;
+    -fx-text-fill: #8b2525;
 }
 
 .avatar {
-    -fx-background-color: #3f5945;
-    -fx-background-radius: 20px;
-    -fx-font-size: 12px;
+    -fx-background-color: #314d7d;
+    -fx-background-radius: 14px;
+    -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-text-fill: #ffffff;
 }
 
 .user-dialog .avatar {
-    -fx-background-color: #725d43;
+    -fx-background-color: #6b7280;
+}
+
+.error-dialog .avatar {
+    -fx-background-color: #c53f3f;
+}
+
+.composer {
+    -fx-background-color: #e8edf5;
+    -fx-border-color: #d2d9e5 transparent transparent transparent;
 }
 
 .text-field {
     -fx-background-color: #ffffff;
-    -fx-background-radius: 8px;
-    -fx-border-color: #c8c1b5;
-    -fx-border-radius: 8px;
-    -fx-padding: 10px;
+    -fx-background-radius: 9px;
+    -fx-border-color: #bdc8d9;
+    -fx-border-radius: 9px;
+    -fx-padding: 10px 12px;
+    -fx-prompt-text-fill: #778196;
+}
+
+.text-field:focused {
+    -fx-border-color: #365caa;
 }
 
 .button {
-    -fx-background-color: #3f5945;
-    -fx-background-radius: 8px;
+    -fx-background-color: #365caa;
+    -fx-background-radius: 9px;
     -fx-font-weight: bold;
     -fx-padding: 10px 18px;
     -fx-text-fill: #ffffff;
 }
 
 .button:hover {
-    -fx-background-color: #304536;
+    -fx-background-color: #294b91;
+}
+
+.button:pressed {
+    -fx-background-color: #203d78;
 }
 
 .button:disabled {
-    -fx-opacity: 0.5;
+    -fx-opacity: 0.45;
 }
