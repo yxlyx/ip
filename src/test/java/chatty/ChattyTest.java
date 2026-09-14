@@ -1,5 +1,6 @@
 package chatty;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -17,6 +18,24 @@ public class ChattyTest {
     /** Temporary directory used for isolated command tests. */
     @TempDir
     private Path tempDirectory;
+
+    /**
+     * Verifies missing storage is accepted and corrupt storage produces a visible warning.
+     *
+     * @throws IOException if corrupt test data cannot be created.
+     */
+    @Test
+    public void startupStorage_missingAndCorruptFiles_handledGracefully() throws IOException {
+        Chatty missingFileChatty = new Chatty(tempDirectory.resolve("missing.txt"));
+        Path corruptFile = tempDirectory.resolve("corrupt.txt");
+        Files.writeString(corruptFile, "invalid record", StandardCharsets.UTF_8);
+        Chatty corruptFileChatty = new Chatty(corruptFile);
+
+        assertNull(missingFileChatty.getStartupWarning());
+        assertTrue(missingFileChatty.getResponse("list").equals(" Flight plan status:"));
+        assertTrue(corruptFileChatty.getStartupWarning().contains("corrupted at line 1"));
+        assertTrue(corruptFileChatty.getResponse("list").equals(" Flight plan status:"));
+    }
 
     /** Verifies command normalization, exit detection, and unknown-command handling. */
     @Test

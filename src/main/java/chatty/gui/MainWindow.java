@@ -49,6 +49,10 @@ public class MainWindow extends AnchorPane {
         dialogContainer.getChildren().add(
                 DialogBox.createChattyDialog(
                         "Orbit online. What shall we put on today's flight plan?"));
+        if (chatty.getStartupWarning() != null) {
+            dialogContainer.getChildren().add(
+                    DialogBox.createErrorDialog(chatty.getStartupWarning()));
+        }
     }
 
     /**

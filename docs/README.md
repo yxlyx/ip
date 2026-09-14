@@ -10,9 +10,9 @@ Enter `todo DESCRIPTION` to add a task without a date or time.
 Example: `todo borrow book`
 
 ```text
-Got it. I've added this task:
+Task added to the flight plan:
   [T][ ] borrow book
-Now you have 1 tasks in the list.
+1 task(s) now on board.
 ```
 
 ## Adding a deadline
@@ -24,22 +24,22 @@ more readable format.
 Example: `deadline return book /by 2019-10-15`
 
 ```text
-Got it. I've added this task:
+Task added to the flight plan:
   [D][ ] return book (by: Oct 15 2019)
-Now you have 2 tasks in the list.
+2 task(s) now on board.
 ```
 
 ## Adding an event
 
 Enter `event DESCRIPTION /from START /to END` to add a task that occurs between
-the given start and end. Chatty stores both values exactly as entered.
+the given start and end. Orbit stores both values exactly as entered.
 
 Example: `event project meeting /from Mon 2pm /to 4pm`
 
 ```text
-Got it. I've added this task:
+Task added to the flight plan:
   [E][ ] project meeting (from: Mon 2pm to: 4pm)
-Now you have 3 tasks in the list.
+3 task(s) now on board.
 ```
 
 ## Adding a recurring task
@@ -51,9 +51,9 @@ and `UNIT` can be `day`, `week`, `month`, or `year`, in singular or plural form.
 Example: `recurring project meeting /on 2026-09-14 /every 1 week`
 
 ```text
-Got it. I've added this task:
+Task added to the flight plan:
   [R][ ] project meeting (on: Sep 14 2026, every: 1 week)
-Now you have 4 tasks in the list.
+4 task(s) now on board.
 ```
 
 A recurring task represents its next pending occurrence. Marking it completes
@@ -69,7 +69,7 @@ Enter `list` to display every task with its number, type, and status:
 - `[ ]` means a task is not done, while `[X]` means it is done.
 
 ```text
-Here are the tasks in your list:
+Flight plan status:
 1.[T][ ] borrow book
 2.[D][ ] return book (by: Sunday)
 3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
@@ -83,7 +83,7 @@ Matches retain their existing order and are numbered within the search results.
 Example: `find book`
 
 ```text
-Here are the matching tasks in your list:
+Radar found these matching tasks:
 1.[T][ ] borrow book
 2.[D][ ] return book (by: Sunday)
 ```
@@ -95,7 +95,7 @@ Enter `mark INDEX`, replacing `INDEX` with the task number shown by `list`.
 Example: `mark 2`
 
 ```text
-Nice! I've marked this task as done:
+Milestone cleared:
   [D][X] return book (by: Sunday)
 ```
 
@@ -103,7 +103,7 @@ For a recurring task, `mark INDEX` completes the current occurrence and advances
 exactly one interval. It does not skip overdue occurrences automatically.
 
 ```text
-Nice! I've completed this occurrence. The next one is:
+Recurring milestone cleared. Next occurrence locked in:
   [R][ ] project meeting (on: Sep 21 2026, every: 1 week)
 ```
 
@@ -114,7 +114,7 @@ Enter `unmark INDEX` to change a completed task back to not done.
 Example: `unmark 2`
 
 ```text
-OK, I've marked this task as not done yet:
+Task returned to active duty:
   [D][ ] return book (by: Sunday)
 ```
 
@@ -129,9 +129,9 @@ The remaining tasks are renumbered automatically.
 Example: `delete 2`
 
 ```text
-Noted. I've removed this task:
+Task removed from the flight plan:
   [D][ ] return book (by: Sunday)
-Now you have 2 tasks in the list.
+2 task(s) remain on board.
 ```
 
 ## Handling invalid input
@@ -150,14 +150,16 @@ must include all documented delimiters and values. Deadline and recurring-task
 dates must use `YYYY-MM-DD` and must represent valid calendar dates. Recurrence
 intervals must contain a positive whole number and a supported unit.
 
-## Exiting Chatty
+## Exiting Orbit
 
-Enter `bye` to close Chatty.
+Enter `bye` to close Orbit.
 
 ```text
-Bye. Hope to see you again soon!
+Orbit signing off. Keep your next milestone in sight!
 ```
 
 Orbit saves every task change to `data/chatty.txt` and restores the task list
-when the application starts. The data directory and file are created automatically
-when the first task change is saved.
+when the application starts. A missing file is treated as an empty task list,
+and the data directory and file are created automatically when the first task
+change is saved. If an existing file cannot be read or is malformed, Orbit
+shows an error and starts with an empty list instead of terminating.

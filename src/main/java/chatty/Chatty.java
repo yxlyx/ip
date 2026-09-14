@@ -24,6 +24,9 @@ public class Chatty {
     /** Tasks managed during the current session. */
     private TaskList tasks;
 
+    /** Warning produced when saved tasks cannot be loaded during startup. */
+    private String startupWarning;
+
     /**
      * Creates Chatty with a task data file at the given path.
      *
@@ -38,6 +41,9 @@ public class Chatty {
     /** Runs Chatty until input ends or the user enters {@code bye}. */
     public void run() {
         ui.showGreeting();
+        if (startupWarning != null) {
+            ui.showResponse(startupWarning);
+        }
         while (ui.hasNextCommand()) {
             String input = ui.readCommand();
             ui.showLine();
@@ -58,9 +64,18 @@ public class Chatty {
         try {
             return new TaskList(storage.loadTasks());
         } catch (ChattyException exception) {
-            ui.showResponse(ui.formatError(exception.getMessage()));
+            startupWarning = ui.formatError(exception.getMessage());
             return new TaskList();
         }
+    }
+
+    /**
+     * Returns a warning produced while loading saved tasks, if loading failed.
+     *
+     * @return formatted startup warning, or {@code null} when loading succeeded.
+     */
+    public String getStartupWarning() {
+        return startupWarning;
     }
 
     /**
