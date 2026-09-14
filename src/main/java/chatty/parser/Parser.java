@@ -139,9 +139,11 @@ public class Parser {
                     + "Try: deadline DESCRIPTION " + DEADLINE_BY_DELIMITER + " DATE_OR_TIME");
         }
 
+        requireSingleDelimiter(details, DEADLINE_BY_DELIMITER, "deadline");
         String description = details.substring(0, byIndex).strip();
         String byText = details.substring(byIndex + DEADLINE_BY_DELIMITER.length()).strip();
         requireDescription(description, "deadline");
+        requireStorableText(byText, "deadline date");
         if (byText.isEmpty()) {
             throw new ChattyException("OOPS!!! Tell me when the deadline is due after '"
                     + DEADLINE_BY_DELIMITER + "'.");
@@ -173,6 +175,7 @@ public class Parser {
                     + EVENT_TO_DELIMITER + " END");
         }
 
+        requireSingleDelimiter(details, EVENT_FROM_DELIMITER, "event");
         int toIndex = details.indexOf(EVENT_TO_DELIMITER,
                 fromIndex + EVENT_FROM_DELIMITER.length());
         if (toIndex < 0) {
@@ -180,6 +183,7 @@ public class Parser {
                     + "' also needs an ending value after '" + EVENT_TO_DELIMITER + "'.");
         }
 
+        requireSingleDelimiter(details, EVENT_TO_DELIMITER, "event");
         String description = details.substring(0, fromIndex).strip();
         String from = details.substring(fromIndex + EVENT_FROM_DELIMITER.length(), toIndex).strip();
         String to = details.substring(toIndex + EVENT_TO_DELIMITER.length()).strip();
@@ -191,6 +195,8 @@ public class Parser {
             throw new ChattyException("OOPS!!! Tell me when the event ends after '"
                     + EVENT_TO_DELIMITER + "'.");
         }
+        requireStorableText(from, "event start");
+        requireStorableText(to, "event end");
         return new Event(description, from, to);
     }
 
@@ -212,6 +218,7 @@ public class Parser {
                     + " YYYY-MM-DD " + RECURRING_EVERY_DELIMITER + " NUMBER UNIT");
         }
 
+        requireSingleDelimiter(details, RECURRING_ON_DELIMITER, "recurring task");
         int everyIndex = details.indexOf(RECURRING_EVERY_DELIMITER,
                 onIndex + RECURRING_ON_DELIMITER.length());
         if (everyIndex < 0) {
@@ -220,6 +227,7 @@ public class Parser {
                     + RECURRING_EVERY_DELIMITER + "'.");
         }
 
+        requireSingleDelimiter(details, RECURRING_EVERY_DELIMITER, "recurring task");
         String description = details.substring(0, onIndex).strip();
         String dateText = details.substring(
                 onIndex + RECURRING_ON_DELIMITER.length(), everyIndex).strip();
@@ -277,6 +285,36 @@ public class Parser {
     }
 
     /**
+     * Ensures a delimiter occurs exactly once in a task command.
+     *
+     * @param details task-command details containing delimiters.
+     * @param delimiter delimiter that must occur once.
+     * @param taskType task type used in the error message.
+     * @throws ChattyException if the delimiter is repeated.
+     */
+    private static void requireSingleDelimiter(String details, String delimiter, String taskType)
+            throws ChattyException {
+        if (details.indexOf(delimiter) != details.lastIndexOf(delimiter)) {
+            throw new ChattyException("OOPS!!! Use '" + delimiter + "' only once in a "
+                    + taskType + " command.");
+        }
+    }
+
+    /**
+     * Ensures a user-provided value can be represented by the storage format.
+     *
+     * @param text value to validate.
+     * @param fieldName field described in the error message.
+     * @throws ChattyException if the value contains a reserved separator.
+     */
+    private static void requireStorableText(String text, String fieldName) throws ChattyException {
+        if (text.contains("|")) {
+            throw new ChattyException("OOPS!!! The " + fieldName
+                    + " cannot contain the reserved '|' character.");
+        }
+    }
+
+    /**
      * Throws a specific error when a task description is empty.
      *
      * @param description task description to validate.
@@ -289,5 +327,6 @@ public class Parser {
             throw new ChattyException("OOPS!!! The description of " + article + " "
                     + taskType + " cannot be empty.");
         }
+        requireStorableText(description, taskType + " description");
     }
 }

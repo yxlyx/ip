@@ -2,6 +2,9 @@ package chatty;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,24 @@ public class ChattyTest {
     /** Temporary directory used for isolated command tests. */
     @TempDir
     private Path tempDirectory;
+
+    /**
+     * Verifies that a failed save restores the last task list held in storage.
+     *
+     * @throws IOException if the blocking parent file cannot be created.
+     */
+    @Test
+    public void getResponse_saveFails_unsavedTaskRemovedFromMemory() throws IOException {
+        Path blockingParent = tempDirectory.resolve("not-a-directory");
+        Files.writeString(blockingParent, "blocking file", StandardCharsets.UTF_8);
+        Chatty chatty = new Chatty(blockingParent.resolve("chatty.txt"));
+
+        String addResponse = chatty.getResponse("todo read book");
+        String listResponse = chatty.getResponse("list");
+
+        assertTrue(addResponse.contains("couldn't save your tasks"));
+        assertTrue(listResponse.equals(" Flight plan status:"));
+    }
 
     /** Verifies the recurring-task add, mark, list, and unmark command flow. */
     @Test
