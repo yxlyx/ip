@@ -1,6 +1,6 @@
-# Orbit task manager
+# Chatty task manager
 
-Orbit is a mission-control-inspired task manager built for the NUS CS2103T
+Chatty is a mission-control-inspired task manager built for the NUS CS2103T
 iP project. It supports todos, deadlines, events, recurring tasks, persistent
 storage, command search, and a responsive JavaFX interface.
 
@@ -13,7 +13,7 @@ Prerequisites: JDK 25 and a current IntelliJ IDEA version.
 1. Open the repository as an IntelliJ project.
 2. Configure the project SDK as JDK 25 and use the SDK default language level.
 3. Run `chatty.gui.Launcher.main()` to start the JavaFX interface.
-4. Alternatively, run `chatty.Chatty.main()` to use Orbit in the console.
+4. Alternatively, run `chatty.Chatty.main()` to use Chatty in the console.
 
 Keep `src/main/java` as the source root because Gradle and the IDE expect the
 standard Java project layout.
@@ -34,7 +34,7 @@ Build the executable fat JAR with:
 
 The generated application is written to `build/libs/Chatty.jar`. The artifact
 keeps its established filename for build compatibility; the product shown to
-users is Orbit.
+users is Chatty.
 
 ## User guide
 

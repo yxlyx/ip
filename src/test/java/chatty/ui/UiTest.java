@@ -29,16 +29,16 @@ public class UiTest {
         assertEquals(" Flight plan status:", ui.formatTaskList(List.of()));
     }
 
-    /** Verifies confirmations and errors use Orbit's expected voice and task details. */
+    /** Verifies confirmations and errors use Chatty's expected voice and task details. */
     @Test
-    public void formatResponses_taskOperations_orbitMessagesReturned() {
+    public void formatResponses_taskOperations_chattyMessagesReturned() {
         Ui ui = new Ui();
         Todo task = new Todo("read book");
         RecurringTask recurringTask = new RecurringTask("team meeting",
                 LocalDate.of(2026, 9, 21), 1, RecurrenceUnit.WEEK);
 
         assertEquals(" OOPS!!! Invalid command.", ui.formatError("OOPS!!! Invalid command."));
-        assertEquals(" Orbit signing off. Keep your next milestone in sight!", ui.formatExit());
+        assertEquals(" Chatty signing off. Keep your next milestone in sight!", ui.formatExit());
         assertEquals(" Task added to the flight plan:\n   [T][ ] read book\n"
                 + " 1 task(s) now on board.", ui.formatTaskAdded(task, 1));
         task.markAsDone();

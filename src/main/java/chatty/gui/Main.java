@@ -30,7 +30,7 @@ public class Main extends Application {
         MainWindow mainWindow = fxmlLoader.getController();
         mainWindow.setChatty(new Chatty(DATA_FILE_PATH));
 
-        stage.setTitle("Orbit — Task Mission Control");
+        stage.setTitle("Chatty — Task Mission Control");
         stage.setMinWidth(380);
         stage.setMinHeight(480);
         stage.setScene(new Scene(root));
