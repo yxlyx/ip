@@ -2,8 +2,10 @@ package chatty.storage;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -75,6 +77,7 @@ public class Storage {
      * @throws ChattyException if the directory or data file cannot be written.
      */
     public void saveTasks(List<Task> tasks) throws ChattyException {
+        Path temporaryFile = null;
         try {
             Path parentDirectory = filePath.getParent();
             if (parentDirectory != null) {
@@ -85,9 +88,46 @@ public class Storage {
             for (Task task : tasks) {
                 taskRecords.add(formatTask(task));
             }
-            Files.write(filePath, taskRecords, StandardCharsets.UTF_8);
+
+            Path temporaryDirectory = parentDirectory == null ? Path.of(".") : parentDirectory;
+            temporaryFile = Files.createTempFile(temporaryDirectory, "chatty-", ".tmp");
+            Files.write(temporaryFile, taskRecords, StandardCharsets.UTF_8);
+            replaceDataFile(temporaryFile);
+            temporaryFile = null;
         } catch (IOException exception) {
+            deleteTemporaryFile(temporaryFile);
             throw new ChattyException("OOPS!!! I couldn't save your tasks to the data file.");
+        }
+    }
+
+    /**
+     * Replaces the data file with a completely written temporary file.
+     *
+     * @param temporaryFile temporary file containing every task record.
+     * @throws IOException if the replacement fails.
+     */
+    private void replaceDataFile(Path temporaryFile) throws IOException {
+        try {
+            Files.move(temporaryFile, filePath, StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (AtomicMoveNotSupportedException exception) {
+            Files.move(temporaryFile, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    /**
+     * Removes a temporary save file after a failed write, if one was created.
+     *
+     * @param temporaryFile temporary file to remove, or {@code null}.
+     */
+    private void deleteTemporaryFile(Path temporaryFile) {
+        if (temporaryFile == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(temporaryFile);
+        } catch (IOException exception) {
+            // The original data file remains untouched even if temporary cleanup fails.
         }
     }
 

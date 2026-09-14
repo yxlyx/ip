@@ -106,8 +106,13 @@ public class ParserTest {
                 Parser.parseTask("deadline submit report", CommandType.DEADLINE));
         assertThrows(ChattyException.class, () ->
                 Parser.parseTask("deadline submit report /by 2026-02-30", CommandType.DEADLINE));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "deadline submit report /by 2026-09-20 /by 2026-09-21",
+                CommandType.DEADLINE));
         assertThrows(ChattyException.class, () ->
                 Parser.parseTask("event meeting /from 2pm", CommandType.EVENT));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "event meeting /from 2pm /to 3pm /to 4pm", CommandType.EVENT));
         assertThrows(ChattyException.class, () ->
                 Parser.parseTask("recurring meeting /on 2026-09-14", CommandType.RECURRING));
         assertThrows(ChattyException.class, () -> Parser.parseTask(
@@ -116,6 +121,13 @@ public class ParserTest {
                 "recurring meeting /on 2026-09-14 /every 0 weeks", CommandType.RECURRING));
         assertThrows(ChattyException.class, () -> Parser.parseTask(
                 "recurring meeting /on 2026-09-14 /every 1 fortnight", CommandType.RECURRING));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "recurring meeting /on 2026-09-14 /every 1 week /every 2 weeks",
+                CommandType.RECURRING));
+        assertThrows(ChattyException.class, () ->
+                Parser.parseTask("todo read | revise", CommandType.TODO));
+        assertThrows(ChattyException.class, () -> Parser.parseTask(
+                "event meeting /from room | one /to 4pm", CommandType.EVENT));
         assertThrows(ChattyException.class, () ->
                 Parser.parseTask("list", CommandType.LIST));
     }

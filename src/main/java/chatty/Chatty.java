@@ -179,7 +179,17 @@ public class Chatty {
      * @throws ChattyException if the task list cannot be saved.
      */
     private void saveTasks() throws ChattyException {
-        storage.saveTasks(tasks.getTasks());
+        try {
+            storage.saveTasks(tasks.getTasks());
+        } catch (ChattyException saveException) {
+            try {
+                tasks = new TaskList(storage.loadTasks());
+            } catch (ChattyException loadException) {
+                throw new ChattyException(saveException.getMessage()
+                        + " I also couldn't restore the last saved task list.");
+            }
+            throw saveException;
+        }
     }
 
     /**

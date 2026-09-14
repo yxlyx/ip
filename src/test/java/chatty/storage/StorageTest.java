@@ -98,6 +98,28 @@ public class StorageTest {
     }
 
     /**
+     * Verifies that saving replaces the complete file without leaving temporary files.
+     *
+     * @throws ChattyException if saving valid tasks fails unexpectedly.
+     * @throws IOException if inspecting the storage directory fails unexpectedly.
+     */
+    @Test
+    public void saveTasks_existingData_dataReplacedAndTemporaryFileRemoved()
+            throws ChattyException, IOException {
+        Path filePath = tempDirectory.resolve("data/chatty.txt");
+        Storage storage = new Storage(filePath);
+        storage.saveTasks(List.of(new Todo("old task")));
+
+        storage.saveTasks(List.of(new Todo("new task")));
+
+        assertEquals(List.of("T | 0 | new task"),
+                Files.readAllLines(filePath, StandardCharsets.UTF_8));
+        try (var files = Files.list(filePath.getParent())) {
+            assertFalse(files.anyMatch(path -> path.getFileName().toString().endsWith(".tmp")));
+        }
+    }
+
+    /**
      * Verifies that blank lines in a data file are ignored.
      *
      * @throws ChattyException if loading the valid data fails unexpectedly.
