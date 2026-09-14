@@ -14,14 +14,15 @@ public class Ui {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
 
     /** Chatty's logo, displayed when the application starts. */
-    private static final String BANNER = "   ___       _     _ _   \n"
-            + "  / _ \\ _ __| |__ (_) |_ \n"
-            + " | | | | '__| '_ \\| | __|\n"
-            + " | |_| | |  | |_) | | |_ \n"
-            + "  \\___/|_|  |_.__/|_|\\__|";
+    private static final String BANNER = "  ____ _           _   _         \n"
+            + " / ___| |__   __ _| |_| |_ _   _ \n"
+            + "| |   | '_ \\ / _` | __| __| | | |\n"
+            + "| |___| | | | (_| | |_| |_| |_| |\n"
+            + " \\____|_| |_|\\__,_|\\__|\\__|\\__, |\n"
+            + "                           |___/";
 
-    /** Greeting displayed after Orbit's logo. */
-    private static final String WELCOME = "Orbit online.\nWhat shall we put on today's flight plan?";
+    /** Greeting displayed after Chatty's logo. */
+    private static final String WELCOME = "Chatty online.\nWhat shall we put on today's flight plan?";
 
     /** Scanner used to read commands from standard input. */
     private final Scanner scanner;
@@ -74,7 +75,7 @@ public class Ui {
      * @return farewell response.
      */
     public String formatExit() {
-        return " Orbit signing off. Keep your next milestone in sight!";
+        return " Chatty signing off. Keep your next milestone in sight!";
     }
 
     /**
