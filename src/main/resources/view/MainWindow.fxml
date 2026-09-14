@@ -40,12 +40,12 @@
             <children>
                 <TextField fx:id="userInput"
                            onAction="#handleUserInput"
-                           promptText="Enter a command..."
+                           promptText="Add a task or enter a command..."
                            HBox.hgrow="ALWAYS" />
                 <Button fx:id="sendButton"
                         defaultButton="true"
                         onAction="#handleUserInput"
-                        text="Send" />
+                        text="Launch" />
             </children>
         </HBox>
     </children>

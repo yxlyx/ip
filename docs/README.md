@@ -1,7 +1,7 @@
-# Chatty User Guide
+# Orbit User Guide
 
-Chatty is a command-line task manager that keeps track of todos, deadlines,
-and events across application sessions.
+Orbit is a mission-control-inspired task manager that keeps track of todos,
+deadlines, events, and recurring work across application sessions.
 
 ## Adding a todo
 
@@ -18,7 +18,7 @@ Now you have 1 tasks in the list.
 ## Adding a deadline
 
 Enter `deadline DESCRIPTION /by YYYY-MM-DD` to add a task that must be
-completed by a specific date. Chatty validates the date and displays it in a
+completed by a specific date. Orbit validates the date and displays it in a
 more readable format.
 
 Example: `deadline return book /by 2019-10-15`
@@ -118,7 +118,7 @@ OK, I've marked this task as not done yet:
   [D][ ] return book (by: Sunday)
 ```
 
-Recurring tasks cannot be unmarked because Chatty keeps only their next pending
+Recurring tasks cannot be unmarked because Orbit keeps only their next pending
 occurrence rather than a history of completed occurrences.
 
 ## Deleting a task
@@ -136,7 +136,7 @@ Now you have 2 tasks in the list.
 
 ## Handling invalid input
 
-Chatty explains invalid commands instead of stopping unexpectedly. Error
+Orbit explains invalid commands instead of stopping unexpectedly. Error
 messages identify what is missing and, where useful, show the expected format.
 For example, a todo must have a description:
 
@@ -158,6 +158,6 @@ Enter `bye` to close Chatty.
 Bye. Hope to see you again soon!
 ```
 
-Chatty saves every task change to `data/chatty.txt` and restores the task list
+Orbit saves every task change to `data/chatty.txt` and restores the task list
 when the application starts. The data directory and file are created automatically
 when the first task change is saved.

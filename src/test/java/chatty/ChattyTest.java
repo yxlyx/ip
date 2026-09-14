@@ -28,7 +28,7 @@ public class ChattyTest {
 
         assertTrue(addedResponse.contains(
                 "[R][ ] project meeting (on: Sep 14 2026, every: 1 week)"));
-        assertTrue(markedResponse.contains("completed this occurrence"));
+        assertTrue(markedResponse.contains("Recurring milestone cleared"));
         assertTrue(markedResponse.contains("on: Sep 21 2026"));
         assertTrue(listResponse.contains("on: Sep 21 2026"));
         assertTrue(unmarkResponse.contains("cannot be unmarked"));

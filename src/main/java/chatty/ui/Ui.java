@@ -14,15 +14,14 @@ public class Ui {
     private static final String HORIZONTAL_LINE = "____________________________________________________________";
 
     /** Chatty's logo, displayed when the application starts. */
-    private static final String BANNER = "  ____ _           _   _         \n"
-            + " / ___| |__   __ _| |_| |_ _   _ \n"
-            + "| |   | '_ \\ / _` | __| __| | | |\n"
-            + "| |___| | | | (_| | |_| |_| |_| |\n"
-            + " \\____|_| |_|\\__,_|\\__|\\__|\\__, |\n"
-            + "                           |___/";
+    private static final String BANNER = "   ___       _     _ _   \n"
+            + "  / _ \\ _ __| |__ (_) |_ \n"
+            + " | | | | '__| '_ \\| | __|\n"
+            + " | |_| | |  | |_) | | |_ \n"
+            + "  \\___/|_|  |_.__/|_|\\__|";
 
-    /** Greeting displayed after Chatty's logo. */
-    private static final String WELCOME = "Hello! I'm Chatty.\nWhat can I do for you?";
+    /** Greeting displayed after Orbit's logo. */
+    private static final String WELCOME = "Orbit online.\nWhat shall we put on today's flight plan?";
 
     /** Scanner used to read commands from standard input. */
     private final Scanner scanner;
@@ -75,7 +74,7 @@ public class Ui {
      * @return farewell response.
      */
     public String formatExit() {
-        return " Bye. Hope to see you again soon!";
+        return " Orbit signing off. Keep your next milestone in sight!";
     }
 
     /**
@@ -95,7 +94,7 @@ public class Ui {
      * @return formatted task-list response.
      */
     public String formatTaskList(List<Task> tasks) {
-        return formatTasks(" Here are the tasks in your list:", tasks);
+        return formatTasks(" Flight plan status:", tasks);
     }
 
     /**
@@ -105,7 +104,7 @@ public class Ui {
      * @return formatted matching-task response.
      */
     public String formatMatchingTasks(List<Task> matchingTasks) {
-        return formatTasks(" Here are the matching tasks in your list:", matchingTasks);
+        return formatTasks(" Radar found these matching tasks:", matchingTasks);
     }
 
     /**
@@ -117,9 +116,9 @@ public class Ui {
      */
     public String formatTaskAdded(Task task, int taskCount) {
         return formatLines(
-                " Got it. I've added this task:",
+                " Task added to the flight plan:",
                 "   " + task,
-                " Now you have " + taskCount + " tasks in the list.");
+                " " + taskCount + " task(s) now on board.");
     }
 
     /**
@@ -129,7 +128,7 @@ public class Ui {
      * @return formatted task-marked response.
      */
     public String formatTaskMarked(Task task) {
-        return formatLines(" Nice! I've marked this task as done:", "   " + task);
+        return formatLines(" Milestone cleared:", "   " + task);
     }
 
     /**
@@ -140,7 +139,7 @@ public class Ui {
      */
     public String formatRecurringTaskAdvanced(RecurringTask task) {
         return formatLines(
-                " Nice! I've completed this occurrence. The next one is:",
+                " Recurring milestone cleared. Next occurrence locked in:",
                 "   " + task);
     }
 
@@ -151,7 +150,7 @@ public class Ui {
      * @return formatted task-unmarked response.
      */
     public String formatTaskUnmarked(Task task) {
-        return formatLines(" OK, I've marked this task as not done yet:", "   " + task);
+        return formatLines(" Task returned to active duty:", "   " + task);
     }
 
     /**
@@ -163,9 +162,9 @@ public class Ui {
      */
     public String formatTaskDeleted(Task task, int taskCount) {
         return formatLines(
-                " Noted. I've removed this task:",
+                " Task removed from the flight plan:",
                 "   " + task,
-                " Now you have " + taskCount + " tasks in the list.");
+                " " + taskCount + " task(s) remain on board.");
     }
 
     /**
