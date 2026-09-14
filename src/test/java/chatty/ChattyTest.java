@@ -18,6 +18,42 @@ public class ChattyTest {
     @TempDir
     private Path tempDirectory;
 
+    /** Verifies command normalization, exit detection, and unknown-command handling. */
+    @Test
+    public void basicCommands_whitespaceAndUnknownInput_handledCorrectly() {
+        Chatty chatty = new Chatty(tempDirectory.resolve("chatty.txt"));
+
+        assertTrue(chatty.shouldExit("  bye  "));
+        assertTrue(!chatty.shouldExit("bye now"));
+        assertTrue(chatty.getResponse("unknown command").contains("don't recognise"));
+        assertTrue(chatty.getResponse("   list   ").equals(" Flight plan status:"));
+    }
+
+    /**
+     * Verifies add, find, mark, unmark, delete, and reload behavior across commands.
+     */
+    @Test
+    public void getResponse_standardTaskCommands_mutationsPersistAcrossReload() {
+        Path filePath = tempDirectory.resolve("chatty.txt");
+        Chatty chatty = new Chatty(filePath);
+
+        assertTrue(chatty.getResponse("todo read book").contains("[T][ ] read book"));
+        assertTrue(chatty.getResponse("deadline submit report /by 2026-10-15")
+                .contains("[D][ ] submit report"));
+        assertTrue(chatty.getResponse("event meeting /from 2pm /to 4pm")
+                .contains("[E][ ] meeting"));
+        assertTrue(chatty.getResponse("find report").contains("submit report"));
+        assertTrue(chatty.getResponse("mark 1").contains("[T][X] read book"));
+        assertTrue(chatty.getResponse("unmark 1").contains("[T][ ] read book"));
+        assertTrue(chatty.getResponse("delete 2").contains("submit report"));
+
+        Chatty reloadedChatty = new Chatty(filePath);
+        String reloadedList = reloadedChatty.getResponse("list");
+        assertTrue(reloadedList.contains("read book"));
+        assertTrue(reloadedList.contains("meeting"));
+        assertTrue(!reloadedList.contains("submit report"));
+    }
+
     /**
      * Verifies that a failed save restores the last task list held in storage.
      *
