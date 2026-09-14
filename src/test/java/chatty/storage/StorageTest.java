@@ -154,6 +154,32 @@ public class StorageTest {
     }
 
     /**
+     * Verifies malformed type, status, field count, and recurrence fields are rejected.
+     *
+     * @throws IOException if creating malformed test data fails unexpectedly.
+     */
+    @Test
+    public void loadTasks_variousMalformedRecords_exceptionThrown() throws IOException {
+        List<String> malformedRecords = List.of(
+                "X | 0 | unknown type",
+                "T | 2 | invalid status",
+                "T | 0 | description | extra",
+                "D | 0 | deadline | ",
+                "E | 0 | event | start | ",
+                "R | 0 | recurring | 2026-09-21 | zero | WEEK",
+                "R | 0 | recurring | 2026-09-21 | -1 | WEEK",
+                "R | 0 | recurring | 2026-09-21 | 1 | FORTNIGHT");
+
+        for (int i = 0; i < malformedRecords.size(); i++) {
+            Path filePath = tempDirectory.resolve("malformed-" + i + ".txt");
+            Files.writeString(filePath, malformedRecords.get(i), StandardCharsets.UTF_8);
+            Storage storage = new Storage(filePath);
+
+            assertThrows(ChattyException.class, storage::loadTasks);
+        }
+    }
+
+    /**
      * Verifies that malformed records identify their one-based line number.
      *
      * @throws IOException if creating the malformed test data file fails unexpectedly.
