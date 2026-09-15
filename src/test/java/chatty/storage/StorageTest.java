@@ -55,6 +55,19 @@ public class StorageTest {
             throws ChattyException, IOException {
         Path filePath = tempDirectory.resolve("data/chatty.txt");
         Storage storage = new Storage(filePath);
+
+        storage.saveTasks(createTasksForRoundTrip());
+
+        assertSavedTaskRecords(filePath);
+        assertLoadedTaskDataAndStatus(storage.loadTasks());
+    }
+
+    /**
+     * Creates all supported task types with both completed and incomplete statuses.
+     *
+     * @return the tasks used to verify the storage round trip.
+     */
+    private List<Task> createTasksForRoundTrip() {
         Todo todo = new Todo("read book");
         todo.markAsDone();
         Deadline deadline = new Deadline("submit report", LocalDate.of(2026, 10, 15));
@@ -63,16 +76,30 @@ public class StorageTest {
         RecurringTask recurringTask = new RecurringTask("team meeting",
                 LocalDate.of(2026, 9, 14), 1, RecurrenceUnit.WEEK);
 
-        storage.saveTasks(List.of(todo, deadline, event, recurringTask));
+        return List.of(todo, deadline, event, recurringTask);
+    }
 
+    /**
+     * Verifies the exact saved records, including task order, fields, and statuses.
+     *
+     * @param filePath the saved task file to inspect.
+     * @throws IOException if reading the saved file fails unexpectedly.
+     */
+    private void assertSavedTaskRecords(Path filePath) throws IOException {
         assertEquals(List.of(
                 "T | 1 | read book",
                 "D | 0 | submit report | 2026-10-15",
                 "E | 1 | project meeting | 2pm | 4pm",
                 "R | 0 | team meeting | 2026-09-14 | 1 | WEEK"),
                 Files.readAllLines(filePath, StandardCharsets.UTF_8));
+    }
 
-        List<Task> loadedTasks = storage.loadTasks();
+    /**
+     * Verifies every loaded task's type, data, and completion status.
+     *
+     * @param loadedTasks the tasks restored from the saved file.
+     */
+    private void assertLoadedTaskDataAndStatus(List<Task> loadedTasks) {
         Todo loadedTodo = assertInstanceOf(Todo.class, loadedTasks.get(0));
         Deadline loadedDeadline = assertInstanceOf(Deadline.class, loadedTasks.get(1));
         Event loadedEvent = assertInstanceOf(Event.class, loadedTasks.get(2));

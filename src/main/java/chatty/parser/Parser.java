@@ -211,6 +211,27 @@ public class Parser {
     private static RecurringTask parseRecurringTask(String input) throws ChattyException {
         String details = input.substring(CommandType.RECURRING.getKeyword().length()).strip();
         int onIndex = details.indexOf(RECURRING_ON_DELIMITER);
+        int everyIndex = findRecurringEveryIndex(details, onIndex);
+        String description = details.substring(0, onIndex).strip();
+        String dateText = details.substring(
+                onIndex + RECURRING_ON_DELIMITER.length(), everyIndex).strip();
+        String recurrenceText = details.substring(
+                everyIndex + RECURRING_EVERY_DELIMITER.length()).strip();
+        requireDescription(description, "recurring task");
+        requireRecurringValues(dateText, recurrenceText);
+        LocalDate nextOccurrenceDate = parseRecurringDate(dateText);
+        return createRecurringTask(description, nextOccurrenceDate, recurrenceText);
+    }
+
+    /**
+     * Validates recurring delimiters and locates the interval delimiter.
+     *
+     * @param details recurring-task details.
+     * @param onIndex location of the date delimiter, or -1 if absent.
+     * @return location of the interval delimiter.
+     * @throws ChattyException if delimiters are missing, repeated, or out of order.
+     */
+    private static int findRecurringEveryIndex(String details, int onIndex) throws ChattyException {
         if (onIndex < 0) {
             throw new ChattyException("OOPS!!! A recurring task needs '"
                     + RECURRING_ON_DELIMITER + "' and '" + RECURRING_EVERY_DELIMITER + "'. "
@@ -228,12 +249,17 @@ public class Parser {
         }
 
         requireSingleDelimiter(details, RECURRING_EVERY_DELIMITER, "recurring task");
-        String description = details.substring(0, onIndex).strip();
-        String dateText = details.substring(
-                onIndex + RECURRING_ON_DELIMITER.length(), everyIndex).strip();
-        String recurrenceText = details.substring(
-                everyIndex + RECURRING_EVERY_DELIMITER.length()).strip();
-        requireDescription(description, "recurring task");
+        return everyIndex;
+    }
+
+    /**
+     * Checks that both recurring schedule values are supplied.
+     *
+     * @param dateText next occurrence date text.
+     * @param recurrenceText interval text.
+     * @throws ChattyException if either value is empty.
+     */
+    private static void requireRecurringValues(String dateText, String recurrenceText) throws ChattyException {
         if (dateText.isEmpty()) {
             throw new ChattyException("OOPS!!! Tell me the next occurrence date after '"
                     + RECURRING_ON_DELIMITER + "'.");
@@ -242,14 +268,36 @@ public class Parser {
                     + RECURRING_EVERY_DELIMITER + "'.");
         }
 
-        LocalDate nextOccurrenceDate;
+    }
+
+    /**
+     * Parses the next occurrence date with a recurring-task-specific error.
+     *
+     * @param dateText next occurrence in ISO date format.
+     * @return parsed calendar date.
+     * @throws ChattyException if the date is invalid.
+     */
+    private static LocalDate parseRecurringDate(String dateText) throws ChattyException {
         try {
-            nextOccurrenceDate = LocalDate.parse(dateText);
+            return LocalDate.parse(dateText);
         } catch (DateTimeParseException exception) {
             throw new ChattyException("OOPS!!! Use YYYY-MM-DD for recurring-task dates, "
                     + "such as 2026-09-14.");
         }
 
+    }
+
+    /**
+     * Creates a recurring task after validating its interval and unit.
+     *
+     * @param description validated task description.
+     * @param nextOccurrenceDate validated next occurrence date.
+     * @param recurrenceText positive interval followed by a supported unit.
+     * @return task with the supplied schedule.
+     * @throws ChattyException if the interval or unit is invalid.
+     */
+    private static RecurringTask createRecurringTask(String description, LocalDate nextOccurrenceDate,
+            String recurrenceText) throws ChattyException {
         String[] recurrenceParts = recurrenceText.split("\\s+");
         if (recurrenceParts.length != 2) {
             throw invalidRecurrenceInterval();

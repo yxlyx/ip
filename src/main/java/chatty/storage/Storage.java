@@ -145,51 +145,91 @@ public class Storage {
             throw invalidRecord(lineNumber);
         }
 
-        boolean isDone;
-        if (fields[1].equals(DONE_STATUS)) {
-            isDone = true;
-        } else if (fields[1].equals(NOT_DONE_STATUS)) {
-            isDone = false;
-        } else {
-            throw invalidRecord(lineNumber);
-        }
-
-        Task task;
-        switch (fields[0]) {
-            case "T":
-                requireFields(fields, 3, lineNumber);
-                task = new Todo(fields[2]);
-                break;
-            case "D":
-                requireFields(fields, 4, lineNumber);
-                if (fields[3].isBlank()) {
-                    throw invalidRecord(lineNumber);
-                }
-                try {
-                    task = new Deadline(fields[2], LocalDate.parse(fields[3]));
-                } catch (DateTimeParseException exception) {
-                    throw invalidRecord(lineNumber);
-                }
-                break;
-            case "E":
-                requireFields(fields, 5, lineNumber);
-                if (fields[3].isBlank() || fields[4].isBlank()) {
-                    throw invalidRecord(lineNumber);
-                }
-                task = new Event(fields[2], fields[3], fields[4]);
-                break;
-            case "R":
-                requireFields(fields, 6, lineNumber);
-                task = parseRecurringTask(fields, isDone, lineNumber);
-                break;
-            default:
-                throw invalidRecord(lineNumber);
-        }
-
+        boolean isDone = parseCompletionStatus(fields[1], lineNumber);
+        Task task = parseTaskFields(fields, isDone, lineNumber);
         if (isDone) {
             task.markAsDone();
         }
         return task;
+    }
+
+    /**
+     * Restores the completion status from a stored status field.
+     *
+     * @param status stored completion status.
+     * @param lineNumber one-based line number of the record.
+     * @return whether the stored task is complete.
+     * @throws ChattyException if the status is invalid.
+     */
+    private boolean parseCompletionStatus(String status, int lineNumber) throws ChattyException {
+        if (status.equals(DONE_STATUS)) {
+            return true;
+        } else if (status.equals(NOT_DONE_STATUS)) {
+            return false;
+        }
+        throw invalidRecord(lineNumber);
+    }
+
+    /**
+     * Restores a task using the fields required by its stored type.
+     *
+     * @param fields task storage fields with a validated description and status.
+     * @param isDone stored completion status.
+     * @param lineNumber one-based line number of the record.
+     * @return task before its completion status is applied.
+     * @throws ChattyException if the task type or its fields are invalid.
+     */
+    private Task parseTaskFields(String[] fields, boolean isDone, int lineNumber) throws ChattyException {
+        switch (fields[0]) {
+            case "T":
+                requireFields(fields, 3, lineNumber);
+                return new Todo(fields[2]);
+            case "D":
+                return parseDeadline(fields, lineNumber);
+            case "E":
+                return parseEvent(fields, lineNumber);
+            case "R":
+                requireFields(fields, 6, lineNumber);
+                return parseRecurringTask(fields, isDone, lineNumber);
+            default:
+                throw invalidRecord(lineNumber);
+        }
+    }
+
+    /**
+     * Restores a deadline from its storage fields.
+     *
+     * @param fields deadline storage fields.
+     * @param lineNumber one-based line number of the record.
+     * @return deadline restored from the record.
+     * @throws ChattyException if the field count or due date is invalid.
+     */
+    private Task parseDeadline(String[] fields, int lineNumber) throws ChattyException {
+        requireFields(fields, 4, lineNumber);
+        if (fields[3].isBlank()) {
+            throw invalidRecord(lineNumber);
+        }
+        try {
+            return new Deadline(fields[2], LocalDate.parse(fields[3]));
+        } catch (DateTimeParseException exception) {
+            throw invalidRecord(lineNumber);
+        }
+    }
+
+    /**
+     * Restores an event from its storage fields.
+     *
+     * @param fields event storage fields.
+     * @param lineNumber one-based line number of the record.
+     * @return event restored from the record.
+     * @throws ChattyException if the field count or either time field is invalid.
+     */
+    private Task parseEvent(String[] fields, int lineNumber) throws ChattyException {
+        requireFields(fields, 5, lineNumber);
+        if (fields[3].isBlank() || fields[4].isBlank()) {
+            throw invalidRecord(lineNumber);
+        }
+        return new Event(fields[2], fields[3], fields[4]);
     }
 
     /**
