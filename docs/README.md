@@ -64,9 +64,10 @@ Flight plan status:
 `[T]`, `[D]`, `[E]`, and `[R]` mean todo, deadline, event, and recurring task.
 `[X]` means done; `[ ]` means pending.
 
-Use `find project` to find descriptions containing `project`. **Always use
-numbers from `list` for `mark`, `unmark`, and `delete`**, not numbers in search
-results: search results are numbered separately.
+Use `find project` to find descriptions containing `project`. Search results
+keep their original numbers from `list`, so you can use either display's
+numbers for `mark`, `unmark`, and `delete`. Run `list` again after deleting a
+task because the remaining tasks are renumbered.
 
 ## Completing and deleting tasks
 
@@ -97,5 +98,6 @@ Use the same folder next time to load the same tasks.
 - If a save fails, Chatty reports it and reloads the saved task list; the
   unsuccessful change is not retained.
 - If existing data cannot be read or is malformed, Chatty shows a startup
-  warning and starts with an empty list. **Close Chatty and back up or repair
-  that file before adding tasks**: saving a new list can replace its contents.
+  warning and disables task changes to protect the saved file. Close Chatty,
+  then repair the file or move it aside as a backup before restarting.
+  Moving it aside lets you start a fresh list without overwriting the old one.

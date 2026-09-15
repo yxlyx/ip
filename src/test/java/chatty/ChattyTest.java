@@ -1,5 +1,7 @@
 package chatty;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -89,6 +91,75 @@ public class ChattyTest {
 
         assertTrue(addResponse.contains("couldn't save your tasks"));
         assertTrue(listResponse.equals(" Flight plan status:"));
+    }
+
+    /**
+     * Verifies corrupt storage blocks every mutation until repaired storage is reopened.
+     *
+     * @throws IOException if test storage cannot be written or read.
+     */
+    @Test
+    public void getResponse_corruptStorage_mutationsBlockedUntilRestart() throws IOException {
+        Path filePath = tempDirectory.resolve("corrupt-mutations.txt");
+        byte[] corruptBytes = "invalid record\n".getBytes(StandardCharsets.UTF_8);
+        Files.write(filePath, corruptBytes);
+        Chatty chatty = new Chatty(filePath);
+        String[] commands = {
+            "todo read book",
+            "deadline submit report /by 2026-10-15",
+            "event meeting /from 2pm /to 4pm",
+            "recurring project meeting /on 2026-09-14 /every 1 week",
+            "mark 1",
+            "unmark 1",
+            "delete 1"
+        };
+
+        for (String command : commands) {
+            assertTrue(chatty.getResponse(command).contains("OOPS!!!"), command);
+            assertArrayEquals(corruptBytes, Files.readAllBytes(filePath), command);
+            assertEquals(" Flight plan status:", chatty.getResponse("list"), command);
+        }
+
+        Files.writeString(filePath, "", StandardCharsets.UTF_8);
+        assertTrue(chatty.getResponse("todo still blocked").contains("OOPS!!!"));
+        assertEquals("", Files.readString(filePath, StandardCharsets.UTF_8));
+        assertEquals(" Flight plan status:", chatty.getResponse("list"));
+
+        Chatty restartedChatty = new Chatty(filePath);
+        assertNull(restartedChatty.getStartupWarning());
+        assertTrue(restartedChatty.getResponse("todo recovered").contains("[T][ ] recovered"));
+        assertEquals(" Flight plan status:\n 1.[T][ ] recovered",
+                new Chatty(filePath).getResponse("list"));
+    }
+
+    /** Verifies find retains full-list indices for separated, identically described tasks. */
+    @Test
+    public void getResponse_findOriginalIndices_mutationsTargetCorrectTasksAcrossReload() {
+        Path filePath = tempDirectory.resolve("find-indices.txt");
+        Chatty chatty = new Chatty(filePath);
+        chatty.getResponse("todo unrelated first");
+        chatty.getResponse("todo matching task");
+        chatty.getResponse("todo unrelated middle");
+        chatty.getResponse("todo matching task");
+
+        assertEquals(" Radar found these matching tasks:\n 2.[T][ ] matching task"
+                + "\n 4.[T][ ] matching task", chatty.getResponse("find matching"));
+        assertTrue(chatty.getResponse("mark 4").contains("[T][X] matching task"));
+        assertEquals(" Radar found these matching tasks:\n 2.[T][ ] matching task"
+                + "\n 4.[T][X] matching task", new Chatty(filePath).getResponse("find matching"));
+
+        assertTrue(chatty.getResponse("unmark 4").contains("[T][ ] matching task"));
+        assertEquals(" Radar found these matching tasks:\n 2.[T][ ] matching task"
+                + "\n 4.[T][ ] matching task", new Chatty(filePath).getResponse("find matching"));
+        assertTrue(chatty.getResponse("delete 2").contains("[T][ ] matching task"));
+
+        String expectedList = " Flight plan status:\n 1.[T][ ] unrelated first"
+                + "\n 2.[T][ ] unrelated middle\n 3.[T][ ] matching task";
+        assertEquals(expectedList, chatty.getResponse("list"));
+        Chatty reloadedChatty = new Chatty(filePath);
+        assertEquals(expectedList, reloadedChatty.getResponse("list"));
+        assertEquals(" Radar found these matching tasks:\n 3.[T][ ] matching task",
+                reloadedChatty.getResponse("find matching"));
     }
 
     /** Verifies the recurring-task add, mark, list, and unmark command flow. */

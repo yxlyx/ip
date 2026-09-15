@@ -64,7 +64,9 @@ public class Chatty {
         try {
             return new TaskList(storage.loadTasks());
         } catch (ChattyException exception) {
-            startupWarning = ui.formatError(exception.getMessage());
+            startupWarning = ui.formatError(exception.getMessage()
+                    + " Task changes are disabled to protect your saved data."
+                    + " Repair or move the data file, then restart Chatty.");
             return new TaskList();
         }
     }
@@ -103,13 +105,14 @@ public class Chatty {
      * @throws ChattyException if the command arguments or storage operation are invalid.
      */
     private String processCommand(String input, CommandType command) throws ChattyException {
+        requireWritableSession(command);
         switch (command) {
             case BYE:
                 return ui.formatExit();
             case LIST:
                 return ui.formatTaskList(tasks.getTasks());
             case FIND:
-                return ui.formatMatchingTasks(tasks.find(Parser.parseFindKeyword(input)));
+                return ui.formatMatchingTasks(tasks.find(Parser.parseFindKeyword(input)), tasks.getTasks());
             case MARK:
                 return markTask(input);
             case UNMARK:
@@ -128,6 +131,25 @@ public class Chatty {
                 throw new ChattyException("OOPS!!! I don't recognise that command. "
                         + "Try todo, deadline, event, recurring, list, find, mark, unmark, "
                         + "delete, or bye.");
+        }
+    }
+
+    /**
+     * Prevents task changes after a failed startup load to protect saved data.
+     *
+     * @param command command about to be executed.
+     * @throws ChattyException if a mutating command is attempted in a read-only session.
+     */
+    private void requireWritableSession(CommandType command) throws ChattyException {
+        if (startupWarning == null) {
+            return;
+        }
+        switch (command) {
+            case TODO, DEADLINE, EVENT, RECURRING, MARK, UNMARK, DELETE:
+                throw new ChattyException("OOPS!!! Task changes are disabled because saved data could not be loaded."
+                        + " Repair or move the data file, then restart Chatty.");
+            default:
+                break;
         }
     }
 

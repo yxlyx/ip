@@ -24,8 +24,10 @@ public class UiTest {
 
         assertEquals(" Flight plan status:\n 1.[T][ ] read book\n 2.[T][ ] write notes",
                 ui.formatTaskList(List.of(firstTask, secondTask)));
-        assertEquals(" Radar found these matching tasks:\n 1.[T][ ] write notes",
-                ui.formatMatchingTasks(List.of(secondTask)));
+        assertEquals(" Radar found these matching tasks:\n 2.[T][ ] write notes",
+                ui.formatMatchingTasks(List.of(secondTask), List.of(firstTask, secondTask)));
+        assertEquals(" Radar found these matching tasks:",
+                ui.formatMatchingTasks(List.of(), List.of(firstTask, secondTask)));
         assertEquals(" Flight plan status:", ui.formatTaskList(List.of()));
     }
 

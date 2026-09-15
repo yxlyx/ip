@@ -99,13 +99,20 @@ public class Ui {
     }
 
     /**
-     * Formats tasks that match a find keyword.
+     * Formats matching tasks using their original one-based task-list numbers.
      *
-     * @param matchingTasks matching tasks to format.
-     * @return formatted matching-task response.
+     * @param matchingTasks matching task instances from the full task list.
+     * @param allTasks full task list used by mark, unmark, and delete.
+     * @return formatted matching-task response with actionable task numbers.
      */
-    public String formatMatchingTasks(List<Task> matchingTasks) {
-        return formatTasks(" Radar found these matching tasks:", matchingTasks);
+    public String formatMatchingTasks(List<Task> matchingTasks, List<Task> allTasks) {
+        StringBuilder response = new StringBuilder(" Radar found these matching tasks:");
+        for (int i = 0; i < allTasks.size(); i++) {
+            if (matchingTasks.contains(allTasks.get(i))) {
+                response.append('\n').append(' ').append(i + 1).append('.').append(allTasks.get(i));
+            }
+        }
+        return response.toString();
     }
 
     /**
