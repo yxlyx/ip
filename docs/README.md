@@ -1,165 +1,101 @@
 # Chatty User Guide
 
-Chatty is a mission-control-inspired task manager that keeps track of todos,
-deadlines, events, and recurring work across application sessions.
+Chatty keeps your todos, deadlines, events, and recurring tasks in one flight
+plan. Type a command, press **Enter** (or click **Launch**), and Chatty responds.
+Your tasks are saved automatically between sessions.
 
-## Adding a todo
+![Chatty showing a populated task list in its full desktop window](Ui.png)
 
-Enter `todo DESCRIPTION` to add a task without a date or time.
+## Quick start
 
-Example: `todo borrow book`
+1. Install Java 25.
+2. Place `Chatty.jar` in a folder where you want to keep your tasks.
+3. Open a terminal in that folder and run `java -jar Chatty.jar`.
+4. Try `todo Read the project brief`, then `list`.
 
-```text
-Task added to the flight plan:
-  [T][ ] borrow book
-1 task(s) now on board.
-```
+Building from source instead? Run `./gradlew shadowJar` with Java 25; the JAR
+will be in `build/libs/Chatty.jar`. You can also launch with `./gradlew run`.
+On Windows, use `gradlew.bat` instead of `./gradlew`.
 
-## Adding a deadline
+## Commands at a glance
 
-Enter `deadline DESCRIPTION /by YYYY-MM-DD` to add a task that must be
-completed by a specific date. Chatty validates the date and displays it in a
-more readable format.
+Use the lowercase command words below. Replace uppercase placeholders with your
+own text; do not type the placeholder names. Dates use `YYYY-MM-DD`.
 
-Example: `deadline return book /by 2019-10-15`
+| Action | Format | Example |
+| --- | --- | --- |
+| Add a todo | `todo DESCRIPTION` | `todo Read the project brief` |
+| Add a deadline | `deadline DESCRIPTION /by DATE` | `deadline Submit project proposal /by 2026-09-18` |
+| Add an event | `event DESCRIPTION /from START /to END` | `event Design review /from Fri 2pm /to 3pm` |
+| Add recurring work | `recurring DESCRIPTION /on DATE /every NUMBER UNIT` | `recurring Weekly team check-in /on 2026-09-21 /every 1 week` |
+| Show all tasks | `list` | `list` |
+| Find tasks | `find KEYWORD` | `find project` |
+| Mark done | `mark INDEX` | `mark 1` |
+| Undo completion | `unmark INDEX` | `unmark 1` |
+| Delete a task | `delete INDEX` | `delete 2` |
+| Exit | `bye` | `bye` |
 
-```text
-Task added to the flight plan:
-  [D][ ] return book (by: Oct 15 2019)
-2 task(s) now on board.
-```
+## Adding tasks
 
-## Adding an event
+- **Todos** have a description but no date.
+- **Deadlines** have a valid calendar date. For example, `2026-09-18` is
+  displayed as `Sep 18 2026`.
+- **Events** have start and end text. Chatty keeps these values as entered,
+  so use something clear such as `Fri 2pm` and `3pm`; it does not validate
+  their chronological order.
+- **Recurring tasks** have a next date and a repeating interval. Use a positive
+  whole number and `day`, `week`, `month`, or `year` (plurals work too).
 
-Enter `event DESCRIPTION /from START /to END` to add a task that occurs between
-the given start and end. Chatty stores both values exactly as entered.
+Descriptions and delimiter values cannot be empty. Do not use `|` in task
+text: it is reserved for saving data. Include each required delimiter once.
 
-Example: `event project meeting /from Mon 2pm /to 4pm`
+## Viewing and finding tasks
 
-```text
-Task added to the flight plan:
-  [E][ ] project meeting (from: Mon 2pm to: 4pm)
-3 task(s) now on board.
-```
-
-## Adding a recurring task
-
-Enter `recurring DESCRIPTION /on YYYY-MM-DD /every NUMBER UNIT` to add a task
-that repeats on a calendar schedule. `NUMBER` must be a positive whole number,
-and `UNIT` can be `day`, `week`, `month`, or `year`, in singular or plural form.
-
-Example: `recurring project meeting /on 2026-09-14 /every 1 week`
-
-```text
-Task added to the flight plan:
-  [R][ ] project meeting (on: Sep 14 2026, every: 1 week)
-4 task(s) now on board.
-```
-
-A recurring task represents its next pending occurrence. Marking it completes
-that occurrence and advances the displayed date by one interval. Month and year
-intervals use calendar arithmetic, so a date near the end of a month can be
-adjusted to the last valid day of the resulting month.
-
-## Listing tasks
-
-Enter `list` to display every task with its number, type, and status:
-
-- `[T]` identifies a todo, `[D]` a deadline, `[E]` an event, and `[R]` a recurring task.
-- `[ ]` means a task is not done, while `[X]` means it is done.
+`list` shows your full flight plan:
 
 ```text
 Flight plan status:
-1.[T][ ] borrow book
-2.[D][ ] return book (by: Sunday)
-3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+1.[T][X] Read the project brief
+2.[D][ ] Submit project proposal (by: Sep 18 2026)
+3.[E][ ] Design review (from: Fri 2pm to: 3pm)
+4.[R][ ] Weekly team check-in (on: Sep 21 2026, every: 1 week)
 ```
 
-## Finding tasks
+`[T]`, `[D]`, `[E]`, and `[R]` mean todo, deadline, event, and recurring task.
+`[X]` means done; `[ ]` means pending.
 
-Enter `find KEYWORD` to display tasks whose descriptions contain that keyword.
-Matches retain their existing order and are numbered within the search results.
+Use `find project` to find descriptions containing `project`. **Always use
+numbers from `list` for `mark`, `unmark`, and `delete`**, not numbers in search
+results: search results are numbered separately.
 
-Example: `find book`
+## Completing and deleting tasks
 
-```text
-Radar found these matching tasks:
-1.[T][ ] borrow book
-2.[D][ ] return book (by: Sunday)
-```
+Use `mark 1` to complete task 1 and `unmark 1` to make it pending again.
+Use `delete 2` to remove task 2 permanently. Run `list` afterwards because
+remaining tasks are renumbered. There is no undo command for deletion.
 
-## Marking a task as done
+For a recurring task, marking it completes just the current occurrence and
+advances its next date by one interval. For example, marking a weekly task due
+on September 21, 2026 moves it to September 28, 2026. It stays pending.
 
-Enter `mark INDEX`, replacing `INDEX` with the task number shown by `list`.
+- Overdue occurrences are not skipped automatically; each `mark` advances once.
+- Monthly and yearly schedules use calendar dates. If the target month lacks
+  that day, Chatty uses its last valid day.
+- Recurring tasks cannot be unmarked: only the next occurrence is stored, not
+  completion history.
 
-Example: `mark 2`
+## Saving, errors, and exiting
 
-```text
-Milestone cleared:
-  [D][X] return book (by: Sunday)
-```
+Type `bye` to close Chatty. Every task change is saved automatically to
+`data/chatty.txt`, relative to the folder from which you launch the app.
+Use the same folder next time to load the same tasks.
 
-For a recurring task, `mark INDEX` completes the current occurrence and advances
-exactly one interval. It does not skip overdue occurrences automatically.
-
-```text
-Recurring milestone cleared. Next occurrence locked in:
-  [R][ ] project meeting (on: Sep 21 2026, every: 1 week)
-```
-
-## Marking a task as not done
-
-Enter `unmark INDEX` to change a completed task back to not done.
-
-Example: `unmark 2`
-
-```text
-Task returned to active duty:
-  [D][ ] return book (by: Sunday)
-```
-
-Recurring tasks cannot be unmarked because Chatty keeps only their next pending
-occurrence rather than a history of completed occurrences.
-
-## Deleting a task
-
-Enter `delete INDEX`, replacing `INDEX` with the task number shown by `list`.
-The remaining tasks are renumbered automatically.
-
-Example: `delete 2`
-
-```text
-Task removed from the flight plan:
-  [D][ ] return book (by: Sunday)
-2 task(s) remain on board.
-```
-
-## Handling invalid input
-
-Chatty explains invalid commands instead of stopping unexpectedly. Error
-messages identify what is missing and, where useful, show the expected format.
-For example, a todo must have a description:
-
-```text
-OOPS!!! The description of a todo cannot be empty.
-```
-
-Task numbers used with `mark`, `unmark`, and `delete` must be whole numbers
-that appear in the current list. Deadline, event, and recurring-task commands
-must include all documented delimiters and values. Deadline and recurring-task
-dates must use `YYYY-MM-DD` and must represent valid calendar dates. Recurrence
-intervals must contain a positive whole number and a supported unit.
-
-## Exiting Chatty
-
-Enter `bye` to close Chatty.
-
-```text
-Chatty signing off. Keep your next milestone in sight!
-```
-
-Chatty saves every task change to `data/chatty.txt` and restores the task list
-when the application starts. A missing file is treated as an empty task list,
-and the data directory and file are created automatically when the first task
-change is saved. If an existing file cannot be read or is malformed, Chatty
-shows an error and starts with an empty list instead of terminating.
+- A missing data file means a fresh task list. Chatty creates it on your first
+  saved change.
+- Invalid commands produce an error message rather than closing the app.
+  Check the command spelling, required delimiters, date, and task number.
+- If a save fails, Chatty reports it and reloads the saved task list; the
+  unsuccessful change is not retained.
+- If existing data cannot be read or is malformed, Chatty shows a startup
+  warning and starts with an empty list. **Close Chatty and back up or repair
+  that file before adding tasks**: saving a new list can replace its contents.
