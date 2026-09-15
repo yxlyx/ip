@@ -1,0 +1,46 @@
+name: Released Chatty GUI smoke test
+
+on:
+  push:
+    branches:
+      - test-release-v0.2-platforms
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-smoke:
+    name: GUI smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install plain JDK 25 (without bundled JavaFX)
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: '25'
+          java-package: jdk
+      - name: Install Linux GUI dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-0 xvfb xauth
+      - name: Test released JAR on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a -s '-screen 0 1280x1024x24' python3 .github/smoke/run.py
+      - name: Test released JAR on Windows
+        if: runner.os == 'Windows'
+        run: python .github/smoke/run.py
+      - name: Upload smoke reports and screenshots (no JARs)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-smoke-${{ matrix.os }}
+          path: out/release-smoke/report/
+          if-no-files-found: warn
